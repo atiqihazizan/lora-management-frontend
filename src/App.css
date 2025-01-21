@@ -1,0 +1,302 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+.leaflet-container {
+  /* height: 100%;
+  width: 100%; */
+}
+
+.menu-sensor-container1 {
+  position: absolute;
+  top: 5rem;
+  /* Ubah posisi mengikut keperluan */
+  left: 0.5rem;
+  z-index: 1000;
+  /* Pastikan z-index lebih tinggi daripada peta */
+}
+
+.menu-sensor-container .card {
+  /* background-color: white; */
+  /* Tambahkan latar belakang untuk kejelasan */
+  padding: 0.7rem;
+  /* border-radius: 0.5rem;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); */
+}
+
+.dragging {
+  z-index: 1000;
+  /* Lebih tinggi dari elemen peta */
+}
+
+.custom-hero-icon svg {
+  width: 32px;
+  height: 32px;
+}
+.leaflet-pane.leaflet-marker-pane {
+  z-index: 1000;
+}
+.leaflet-overlay-pane {
+  z-index: 200;
+}
+.marker-droppable-area {
+  z-index: 400;
+}
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 400;
+}
+/* Animasi gelombang */
+.wave-effect {
+  position: absolute;
+  /* top: 10%;
+  left: 10%; */
+  /* width: 20px;
+  height: 20px; */
+  background-color: rgba(255, 0, 0, 0.5);
+  border-radius: 100%;
+  transform: translate(-50%, -50%);
+  animation: wave-pulse 2s infinite;
+  z-index: 1000; /* Pastikan di belakang konten marker */
+}
+
+/* Animasi membesar dan menghilang */
+@keyframes wave-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+  }
+}
+
+.custom-marker .tooltip-body {
+  position: absolute;
+  top: -2px;
+  left: 100%;
+
+  padding: 4px;
+  background-color: white;
+  border-radius: 3px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  max-width: 200px;
+  font-size: 9px;
+}
+.custom-marker .tooltip-body li {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Gaya untuk butang */
+.custom-button {
+  display: inline-block;
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  z-index: 1000; /* Pastikan butang berada di atas lapisan peta */
+  position: relative; /* Pastikan kedudukan butang dalam konteks peta */
+}
+
+.custom-button:hover {
+  background-color: #0056b3;
+}
+
+/* Pastikan butang berada di dalam bar kontrol Leaflet */
+.leaflet-bar {
+  background-color: transparent;
+}
+
+.leaflet-control.custom-button {
+  margin: 5px;
+  z-index: 1000; /* Menetapkan z-index untuk lapisan paling atas */
+}
+.boundaries-container {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 70px;
+  height: 70px;
+  border: 3px solid black; /* Border hitam */
+  background-color: white; /* Latar belakang putih */
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 400;
+  cursor: pointer; /* Mengubah kursor menjadi pointer untuk tombol */
+  transition: transform 0.2s;
+}
+.minimap-container {
+  position: absolute;
+  bottom: 10px;
+  /* bottom: 90px; */
+  left: 10px;
+  width: 70px;
+  height: 70px;
+  border: 3px solid black; /* Border hitam */
+  background-color: white; /* Latar belakang putih */
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 400;
+  cursor: pointer; /* Mengubah kursor menjadi pointer untuk tombol */
+  transition: transform 0.2s;
+}
+.minimap-container:hover {
+  transform: scale(1.05); /* Efek zoom saat hover */
+}
+
+.minimap {
+  width: 100%;
+  height: 100%;
+}
+.minimap-label {
+  position: absolute;
+  bottom: 6px;
+  left: 3px;
+  right: 3px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: bold;
+  z-index: 600;
+  
+  /* text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9); */
+  color: white; /* Warna teks putih */
+  padding: 1px 3px;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.5); 
+  text-align: center;
+}
+
+.minimap-label.dark {
+  color: black;
+}
+
+.minimap-label.light {
+  color: white;
+}
+/* .leaflet-draw-toolbar a {
+  background-color: #007bff;
+  border: none;
+  box-shadow: none;
+} */
+/* .leaflet-draw-toolbar a.leaflet-draw-toolbar-button-enabled {
+  background-color: #0056b3;
+} */
+.leaflet-draw-guides {
+  color: #ff0000;
+}
+/* .leaflet-editable .leaflet-polygon {
+  fill-color: rgba(0, 0, 255, 0.5);
+  stroke: #0000ff;
+} */
+
+/* Efek transisi untuk tile layer */
+.tile-layer {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.tile-layer.fade-in {
+  opacity: 1;
+}
+
+.tile-layer.fade-out {
+  opacity: 0;
+}
+.leaflet-container {
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+.custom-tooltip {
+  pointer-events: auto; /* Memastikan tooltip dapat menerima klik */
+  background-color: rgba(255, 255, 255, 0.3); /* Transparan, dengan opacity 60% */
+  color: black; /* Warna teks */
+  padding: 5px 10px; /* Ruang di sekitar teks */
+  border-radius: 5px; /* Membuat sudut melengkung */
+  font-size: 12px; /* Ukuran font */
+  font-weight: bold; /* Membuat teks tebal */
+  border: 1px solid rgba(0, 0, 0, 0.3); /* Border transparan */
+  text-align: center; /* Pusatkan teks */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15); /* Bayangan lembut */
+}
+
+.side-navbar {
+  @apply fixed top-0 left-[-16rem] h-full bg-gray-800 text-white p-6 transform  transition-transform w-64 z-[499] flex flex-col;
+}
+.btn-zoom,
+.btn-location-center {
+  @apply absolute right-[10px] z-[400] bg-white border border-gray-300 rounded-lg shadow-md;
+}
+.btn-zoom .btn-zoom-content {
+  @apply hover:bg-gray-100;
+}
+.btn-zoom .btn-zoom-content,
+.btn-location-center {
+  @apply w-[30px] h-[30px] flex items-center justify-center;
+}
+.btn-location-center {
+  @apply bottom-[80px]  hover:shadow-lg;
+  /* absolute z-[400] bottom-[80px] right-[10px] w-[30px] h-[30px] bg-white rounded-lg shadow-md flex items-center justify-center border border-gray-300 hover:shadow-lg */
+}
+.btn-flex-icon-text {
+  /* flex gap-2 py-1 px-1.5 shadow-lg bg-white text-sm rounded */
+  @apply flex items-center gap-1 px-1.5 py-1 rounded transition shadow-md text-xs;
+}
+
+.btn-bg-white {
+  @apply bg-white text-gray-800 border-gray-300 hover:bg-gray-50;
+}
+.selected-blue {
+  @apply bg-blue-500 text-white border-blue-500;
+}
+.label-form {
+  @apply block text-sm font-medium text-gray-600 mb-2;
+}
+
+.form-group {
+  @apply mb-4;
+}
+
+.btn-icon-primary {
+  @apply px-3 py-1 border border-primary text-primary rounded-lg shadow-md hover:bg-primary-dark hover:text-white;
+}
+.btn-icon-secondary {
+  @apply px-3 py-1 border border-secondary text-secondary rounded-lg shadow-md hover:bg-secondary-light hover:text-white;
+}
+.btn-icon-danger {
+  @apply px-3 py-1 border border-danger text-danger rounded-lg shadow-md hover:bg-danger-dark hover:text-white;
+}
+.button-primary {
+  @apply px-3 py-1 bg-primary text-white rounded shadow-md hover:bg-primary-dark;
+}
+.button-secondary {
+  @apply px-3 py-1 bg-secondary text-white rounded shadow-md hover:bg-secondary-light;
+}
+.button-danger {
+  @apply px-3 py-1 bg-danger text-white rounded shadow-md hover:bg-danger-dark;
+}
+.card-dialog-layer {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000] transition-opacity duration-300;
+}
+.card-dialog-frame {
+  @apply bg-white w-full max-w-md p-6 rounded-lg shadow-lg relative transform transition-transform duration-300;
+}

@@ -1,0 +1,31 @@
+import { Marker, Popup } from "react-leaflet";
+import { useContext } from "react";
+import { MapLayContext } from "../layouts/MapLayout";
+import ReactDOMServer from "react-dom/server";
+import L from "leaflet";
+import { FaHome } from "react-icons/fa";
+
+const MapAreas = () => {
+  const context = useContext(MapLayContext) || { listMapView: [] };
+  const { listMapView } = context;
+
+  // Custom flag icon using react-icons
+  const flagIcon = new L.DivIcon({
+    html: ReactDOMServer.renderToString(<FaHome size={16} color="red" />),
+    className: "custom-flag-icon",
+    iconSize: [32, 32], // Adjust size as needed
+    iconAnchor: [16, 32], // Centered at the bottom
+    popupAnchor: [0, -32], // Position of the popup relative to the icon
+  });
+
+  return listMapView?.map((m, idx) => <Marker key={idx} position={m.latlng.split(',')} icon={flagIcon}>
+    <Popup>
+      <strong>
+        {m.name}
+      </strong>
+      <br /> {m.latlng}
+    </Popup>
+  </Marker>);
+};
+
+export default MapAreas;

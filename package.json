@@ -1,0 +1,60 @@
+{
+  "name": "lora-mesh-management",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --print-config eslint.config.js",
+    "preview": "vite preview"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@geoman-io/leaflet-geoman-free": "^2.14.2",
+    "@heroicons/react": "^2.2.0",
+    "@tanstack/react-query": "^5.62.16",
+    "axios": "^1.7.9",
+    "geojson-validation": "^1.0.2",
+    "leaflet": "^1.9.3",
+    "leaflet-draw": "^1.0.4",
+    "leaflet-geometryutil": "^0.10.3",
+    "leaflet-routing-machine": "^3.2.12",
+    "mqtt": "^5.10.3",
+    "react": "^18.3.1",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-dnd-touch-backend": "^16.0.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.4.0",
+    "react-leaflet": "^4.2.1",
+    "react-leaflet-google-v2": "^6.0.0",
+    "react-router": "^7.1.1",
+    "react-router-dom": "^7.1.1",
+    "react-toastify": "^11.0.2",
+    "uuid": "^11.0.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/leaflet-draw": "^1.0.11",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.14.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.0.5",
+    "vite-plugin-commonjs": "^0.10.4"
+  }
+}
