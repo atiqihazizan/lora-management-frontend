@@ -38,7 +38,7 @@ export default defineConfig({
   //   },
   // },
   build: {
-    outDir: "../../back-end/nodejs/public",
+    outDir: "../backend/public",
     emptyOutDir: true,
     // chunkSizeWarningLimit: 100,
     rollupOptions: {
