@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
-import { useMapState } from "../../context/MapContext.jsx";
 import "leaflet/dist/leaflet.css";
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
@@ -11,9 +10,10 @@ import DroppableMarker from "./DroppableMarker.jsx";
 import MapBottom from "./MapBottom.jsx";
 import BoundariesMap from "./BoundariesMap.jsx";
 import { isObjectNotEmpty } from "../../utils/constants.jsx";
+import { MapContext } from "../../context/Contexts.js";
 
 const DroppableMap = ({ id, mapview, tiles }) => {
-  const { tileLayer, markers, currentTileIndex } = useMapState();
+  const { tileLayer, markers, currentTileIndex } = useContext(MapContext)
   const mainMapRef = useRef()
 
   delete L.Icon.Default.prototype._getIconUrl;

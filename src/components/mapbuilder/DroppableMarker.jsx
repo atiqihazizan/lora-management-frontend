@@ -1,8 +1,8 @@
 import { Marker, useMap } from "react-leaflet";
 import { useState, useCallback } from "react";
 import { formatLatLong } from "../../utils/constants";
-import { useMapState } from "../../context/MapContext";
 import { useQueryClient } from "@tanstack/react-query";
+import { MapContext } from "../../context/Contexts";
 import PropTypes from "prop-types";
 import IconMarker from "../IconMarker";
 import apiClient from "../../utils/apiClient";
@@ -12,7 +12,7 @@ import WaveCircle from "../WaveCircle";
 const DroppableMarker = (({ marker }) => {
   const map = useMap(); // Get map instance
   const queryClient = useQueryClient();
-  const { setMarkers, openMarkerDialog } = useMapState();
+  const { setMarkers, openMarkerDialog } = useContext(MapContext);
   const [center, setCenter] = useState(() => marker?.latlng.split(",").map((c) => parseFloat(c)));
   const radius = marker?.prop ? marker?.prop?.find(p => p.key === 'radius')?.val || 0 : 0;
 

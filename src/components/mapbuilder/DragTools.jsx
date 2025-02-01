@@ -1,9 +1,9 @@
 import { useDrag } from "react-dnd";
-import { useMapState } from "../../context/MapContext"; // Import useMapState
+import { MapContext } from "../../context/Contexts";
 import PropTypes from "prop-types";
 
 const DragTools = ({ type, data, children }) => {
-  const { setIsDragging } = useMapState();
+  const { setIsDragging } = useContext(MapContext);
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: type,

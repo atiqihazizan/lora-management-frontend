@@ -1,17 +1,16 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import MapProvider from "../context/MapContext"; // Import DragProvider
-import { useStateContext } from "../context/StateContext";
-import apiClient from "../utils/apiClient";
-import DroppableMap from "../components/mapbuilder/DroppableMap";
-import MapToolbar from "../components/mapbuilder/MapToolbar";
-import Loading from "../components/Loading";
-import { useState } from "react";
+import MapProvider,{ useMapState } from "../src/context/MapContext"; // Import DragProvider
+import { useStateContext } from "../src/context/StateContext";
+import apiClient from "../src/utils/apiClient";
+import DroppableMap from "../src/components/mapbuilder/DroppableMap";
+import MapToolbar from "../src/components/mapbuilder/MapToolbar";
+import Loading from "../src/components/Loading";
 
 const MapBuilder = () => {
+  const { setTileLayer } = useMapState();
   const { id } = useParams();
   const { devices, tiles } = useStateContext();
-  const [initTileLayer, setTileLayer ] = useState();
 
   const { data: mapview, isLoading, error: mapviewError } = useQuery({
     queryKey: ['mapview', id],
@@ -41,7 +40,7 @@ const MapBuilder = () => {
 
   return (
     <div className="h-full flex flex-col bg-gray-600">
-      <MapProvider defaultMarkers={mapview?.nodes || []} defaultGeoJson={defaultGeoJson} initTileLayer={initTileLayer}>
+      <MapProvider defaultMarkers={mapview?.nodes || []} defaultGeoJson={defaultGeoJson}>
         <MapToolbar devices={devices} />
         {isLoading ? (
           <div className="spinner m-auto"></div>

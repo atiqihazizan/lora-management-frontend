@@ -3,10 +3,10 @@ import DragTools from './DragTools.jsx';
 import { useMemo } from 'react';
 import { ICONS } from '../../utils/icons';
 import { Link } from 'react-router';
-import { useMapState } from '../../context/MapContext';
+import { MapContext } from '../../context/Contexts.js';
 
 function MapToolbar({ devices }) {
-  const { boundaryFlag } = useMapState();
+  const { boundaryFlag } = useContext(MapContext)();
   const tools = useMemo(
     () => [
       {

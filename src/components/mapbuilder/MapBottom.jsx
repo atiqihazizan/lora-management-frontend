@@ -1,11 +1,11 @@
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { FaMinus, FaPlus, FaLocationCrosshairs } from 'react-icons/fa6';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMapState } from '../../context/MapContext';
 import { useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import PropTypes from 'prop-types';
 import apiClient from '../../utils/apiClient';
+import { MapContext } from '../../context/Contexts';
 
 const MapBottom = ({
   id,
@@ -16,7 +16,7 @@ const MapBottom = ({
   handleCenterButtonClick,
 }) => {
   const queryClient = useQueryClient();
-  const { setTileLayer, setCurrentTileIndex, currentTileIndex, boundaryFlag, setBoundaryFlag } = useMapState();
+  const { setTileLayer, setCurrentTileIndex, currentTileIndex, boundaryFlag, setBoundaryFlag } = useContext(MapContext)();
 
   const findDefaultTileIndex = () => {
     if (mapview?.tile_url !== null) {

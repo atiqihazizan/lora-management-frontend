@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
-import { useMapState } from "../../context/MapContext";
 import { MdOutlineSave } from "react-icons/md";
 import { renderToString } from "react-dom/server";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -10,12 +9,13 @@ import "leaflet/dist/leaflet.css";
 import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
 import "@geoman-io/leaflet-geoman-free";
 import apiClient from "../../utils/apiClient";
+import { MapContext } from "../../context/Contexts";
 // import geojsonValidation from "geojson-validation";
 
 const BoundariesMap = ({ mapview }) => {
   const queryClient = useQueryClient();
   const map = useMap();
-  const { geoJsonData, setGeoJsonData } = useMapState();
+  const { geoJsonData, setGeoJsonData } = useContext(MapContext);
   const featureGroupRef = useRef(L.featureGroup());
   const saveControlRef = useRef(null);
 
