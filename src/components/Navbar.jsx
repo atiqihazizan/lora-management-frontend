@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { useStateContext } from "../context/StateContext";
 import { FaUser, FaCogs, FaKey, FaMap } from "react-icons/fa";
+import { useStateContext } from "../utils/useContexts";
 
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);

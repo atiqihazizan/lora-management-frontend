@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useStateContext } from "../utils/useContexts";
 import MapProvider from "../context/MapContext"; // Import DragProvider
-import { useStateContext } from "../context/StateContext";
 import apiClient from "../utils/apiClient";
 import DroppableMap from "../components/mapbuilder/DroppableMap";
 import MapToolbar from "../components/mapbuilder/MapToolbar";
 import Loading from "../components/Loading";
-import { useState } from "react";
 
 const MapBuilder = () => {
   const { id } = useParams();

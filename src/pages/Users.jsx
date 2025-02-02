@@ -61,9 +61,9 @@ const Users = () => {
   };
 
   const columns = [
-    { key: "username", label: "Username" },
+    { key: "username", label: "Username", width:"300px" },
     { key: "email", label: "Email" },
-    { key: "phone_number", label: "Phone Number" },
+    { key: "phone_number", label: "Phone Number" ,width:"200px"},
   ];
 
   return (
@@ -82,6 +82,7 @@ const Users = () => {
         actionColumn={{
           label: "Actions",
           layout: "horizontal",
+          width: '50px',
           actions: [
             {
               icon: <FaPencilAlt />,
@@ -103,28 +104,36 @@ const Users = () => {
         isOpen={dialogOpen}
         title={isEditMode ? "Edit User" : "Add User"}
         onClose={closeDialog}
-        onOk={handleSave}
-      >
+        onOk={handleSave}>
         <div className="space-y-4">
           <InputField
             id="user-username"
             label="Username"
             value={dialogData?.username || ""}
-            onChange={(e) => setDialogData((prev) => ({ ...prev, username: e.target.value }))}
+            onChange={(e) =>
+              setDialogData((prev) => ({ ...prev, username: e.target.value }))
+            }
             required
           />
           <InputField
             id="user-email"
             label="Email"
             value={dialogData?.email || ""}
-            onChange={(e) => setDialogData((prev) => ({ ...prev, email: e.target.value }))}
+            onChange={(e) =>
+              setDialogData((prev) => ({ ...prev, email: e.target.value }))
+            }
             required
           />
           <InputField
             id="user-phone_number"
             label="Phone Number"
             value={dialogData?.phone_number || ""}
-            onChange={(e) => setDialogData((prev) => ({ ...prev, phone_number: e.target.value }))}
+            onChange={(e) =>
+              setDialogData((prev) => ({
+                ...prev,
+                phone_number: e.target.value,
+              }))
+            }
             required
           />
         </div>

@@ -1,6 +1,6 @@
 import { GeoJSON } from "react-leaflet";
 import { useContext } from "react";
-import { MapLayContext } from "../../layouts/MapLayout";
+import { MapLayContext } from "../../utils/Contexts";
 
 function MapBoundaries() {
   const context = useContext(MapLayContext) || { markers: [], boundaries: [] };

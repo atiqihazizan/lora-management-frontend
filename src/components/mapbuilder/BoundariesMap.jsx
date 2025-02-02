@@ -3,19 +3,19 @@ import { useMap } from "react-leaflet";
 import { MdOutlineSave } from "react-icons/md";
 import { renderToString } from "react-dom/server";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMapContext } from "../../utils/useContexts";
 import L from "leaflet";
 import PropTypes from 'prop-types';
 import "leaflet/dist/leaflet.css";
 import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
 import "@geoman-io/leaflet-geoman-free";
 import apiClient from "../../utils/apiClient";
-import { MapContext } from "../../context/Contexts";
 // import geojsonValidation from "geojson-validation";
 
 const BoundariesMap = ({ mapview }) => {
   const queryClient = useQueryClient();
   const map = useMap();
-  const { geoJsonData, setGeoJsonData } = useContext(MapContext);
+  const { geoJsonData, setGeoJsonData } = useMapContext();
   const featureGroupRef = useRef(L.featureGroup());
   const saveControlRef = useRef(null);
 

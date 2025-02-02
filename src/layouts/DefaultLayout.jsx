@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useStateContext } from "../context/StateContext";
+import { useStateContext } from "../utils/useContexts";
 import PropTypes from 'prop-types';
 
 const DefaultLayout = () => {

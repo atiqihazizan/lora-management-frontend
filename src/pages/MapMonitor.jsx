@@ -1,7 +1,7 @@
 import { LayersControl, MapContainer, TileLayer } from "react-leaflet";
 import { useContext, useEffect, useRef, useState } from "react";
-import { MapLayContext } from "../layouts/MapLayout";
-import { useStateContext } from "../context/StateContext";
+import { MapLayContext } from "../utils/Contexts";
+import { useStateContext } from "../utils/useContexts";
 import L from "leaflet";
 import "leaflet-geometryutil";
 import MapTrackers from "../components/mapmonitor/MapTrackers";

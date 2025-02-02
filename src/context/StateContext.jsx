@@ -1,25 +1,26 @@
 import { toast, ToastContainer } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useState } from "react";
+import { StateContext } from "../utils/Contexts";
 import PropTypes from "prop-types";
 import apiClient from "../utils/apiClient";
 import DialogChangePassword from "../components/DialogChangePassword";
 
-const StateContext = createContext({
-  login: () => console.warn("Authentication not implemented"),
-  logout: () => console.warn("Authentication not implemented"),
-  notify: () => console.warn("Notification not implemented"),
-  userToken: null,
-  userInfo: null,
-  devices: [],
-  tiles: [],
-  handleFocus: () => { },
-  setIsChangePasswordOpen: () => { },
-});
+// const StateContext = createContext({
+//   login: () => console.warn("Authentication not implemented"),
+//   logout: () => console.warn("Authentication not implemented"),
+//   notify: () => console.warn("Notification not implemented"),
+//   userToken: null,
+//   userInfo: null,
+//   devices: [],
+//   tiles: [],
+//   handleFocus: () => { },
+//   setIsChangePasswordOpen: () => { },
+// });
 
-export const useStateContext = () => useContext(StateContext);
+// export const useStateContext = () => useContext(StateContext);
 
-export const StateProvider = ({ children }) => {
+export default function StateProvider ({ children }) {
   const [userToken, setUserToken] = useState(() => localStorage.getItem("authToken") || "");
   const [userInfo, setUserInfo] = useState(null);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false); // State untuk dialog
@@ -202,4 +203,3 @@ StateProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default StateContext;

@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { isObjectNotEmpty } from "../utils/constants";
+import { MapContext } from "../utils/Contexts";
 import PropTypes from "prop-types";
 import apiClient from "../utils/apiClient";
 import DialogDevice from "../components/DialogDevice";
-import { MapContext } from "./Contexts";
 
 const MapProvider = ({
   defaultMarkers,

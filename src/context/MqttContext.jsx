@@ -2,11 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import BrokerClient from "../utils/brokerClient";
 
-const brokerClient = new BrokerClient("ws://178.128.48.114:8885", {
-  keepalive: 60,
-  reconnectPeriod: 5000,
-  connectTimeout: 30000,
-});
+const brokerClient = new BrokerClient();
 
 const MqttContext = createContext();
 

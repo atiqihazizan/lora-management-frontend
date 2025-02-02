@@ -2,12 +2,12 @@ import { useDrop } from "react-dnd";
 import { v4 as uuidv4 } from "uuid";
 import { useMapEvents } from "react-leaflet";
 import { formatLatLong } from "../../utils/constants";
+import { useMapContext } from "../../utils/useContexts";
 import PropTypes from "prop-types";
-import { MapContext } from "../../context/Contexts";
 
 const DroppableAdded = ({ accept, mapid }) => {
   // const geoJsonRef = useRef();
-  const { isDragging, openMarkerDialog } = useContext(MapContext); // Gunakan openMarkerDialog
+  const { isDragging, openMarkerDialog } = useMapContext()
 
   const map = useMapEvents({
     load: () => console.log("Map loaded!"),

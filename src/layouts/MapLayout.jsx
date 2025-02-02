@@ -1,9 +1,8 @@
-import { createContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import SideBarMap from "../components/mapmonitor/SideBarMap";
 import apiClient from "../utils/apiClient";
-
-export const MapLayContext = createContext();
+import { MapLayContext } from "../utils/Contexts";
 
 const MapLayout = () => {
   const [mapSelect, setMapSelect] = useState(null);

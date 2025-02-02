@@ -2,9 +2,13 @@ import mqtt from "mqtt";
 import { matchTopic } from "./constants";
 
 class BrokerClient {
-  constructor(brokerUrl, options = {}) {
-    this.brokerUrl = brokerUrl;
-    this.options = options;
+  constructor() {
+    this.brokerUrl = "ws://178.128.48.114:8885";
+    this.options = {
+      keepalive: 60,
+      reconnectPeriod: 5000,
+      connectTimeout: 30000,
+    };
     this.client = null;
     this.isReconnecting = false; // Flag to prevent multiple simultaneous reconnect attempts
     this.onConnectCallback = null; // Callback for onConnect event

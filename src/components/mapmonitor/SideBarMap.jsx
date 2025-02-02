@@ -1,13 +1,15 @@
 import { useNavigate } from "react-router";
 import { useContext } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { MapLayContext } from "../../layouts/MapLayout";
 import { isObjectNotEmpty } from "../../utils/constants";
+import { MapLayContext } from "../../utils/Contexts";
 import logo from "../../assets/mesh-network.png";
 import PropTypes from "prop-types";
+import { useStateContext } from "../../utils/useContexts";
 
 const SideBarMap = ({ setIsSidebarVisible, isSidebarVisible }) => {
   const navigate = useNavigate();
+  const { userInfo } = useStateContext();
   const { setMapSelect = () => { }, mapSelect = null, boundaries = [] } = useContext(MapLayContext) || {};
 
   return (
@@ -37,8 +39,8 @@ const SideBarMap = ({ setIsSidebarVisible, isSidebarVisible }) => {
             </li>
           ))}
         </ul>
-        <button onClick={() => navigate("/login")} className="px-6 py-2 mt-4 text-white text-sm bg-blue-600 rounded-lg w-full">
-          Login
+        <button onClick={() => userInfo ? navigate("/") :navigate("/login")} className="px-6 py-2 mt-4 text-white text-sm bg-blue-600 rounded-lg w-full">
+          {userInfo ? 'Admin' : 'Login'}
         </button>
       </div>
     </div>
