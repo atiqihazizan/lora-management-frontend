@@ -1,6 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router";
 import DefaultLayout from "./layouts/DefaultLayout";
-import Dashboard from "./pages/Dashboard";
 import SettingsLayout from "./layouts/SettingsLayout";
 import Devices from "./pages/Devices";
 import MapBuilder from "./pages/MapBuilder";
@@ -14,6 +13,7 @@ import NotFoundPage from "./pages/NotFound";
 import Tiles from "./pages/Tiles"; // Import the Tiles page
 import Users from "./pages/Users"; // Import the Users page
 import MapMonitor from "./pages/MapMonitor";
+import Boundaries from "./pages/Boundaries";
 
 const routers = createBrowserRouter([
   {
@@ -28,7 +28,7 @@ const routers = createBrowserRouter([
     element: <DefaultLayout />,
     children: [
       { path: "dashboard", element: <Navigate to="/" /> },
-      { path: "", element: <HeadFootLayout />, children: [{ path: "", element: <Dashboard /> }] },
+      { path: "", element: <HeadFootLayout />, children: [{ path: "", element: <Boundaries /> }] },
       { path: "builder/:id", element: <MapBuilder /> },
       {
         path: "settings", element: <SettingsLayout />, children: [

@@ -1,5 +1,6 @@
 import { createContext } from "react";
-
+export const MapLayContext = createContext();
+export const MqttContext = createContext();
 export const MapContext = createContext({
   isDragging: false,
   setIsDragging: () => { },
@@ -14,8 +15,6 @@ export const MapContext = createContext({
   boundaryFlag: null,
   setBoundaryFlag: () => { },
 });
-
-
 export const StateContext = createContext({
   login: () => console.warn("Authentication not implemented"),
   logout: () => console.warn("Authentication not implemented"),
@@ -27,5 +26,3 @@ export const StateContext = createContext({
   handleFocus: () => { },
   setIsChangePasswordOpen: () => { },
 });
-
-export const MapLayContext = createContext();

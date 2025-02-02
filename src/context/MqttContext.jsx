@@ -1,10 +1,9 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import BrokerClient from "../utils/brokerClient";
+import { MqttContext } from "../utils/Contexts";
 
 const brokerClient = new BrokerClient();
-
-const MqttContext = createContext();
 
 export const MqttProvider = ({ children }) => {
   const [mqttData, setMqttData] = useState({});
@@ -41,4 +40,3 @@ MqttProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export const useMqtt = () => useContext(MqttContext);

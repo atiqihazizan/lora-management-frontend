@@ -1,7 +1,6 @@
 import { LayersControl, MapContainer, TileLayer } from "react-leaflet";
-import { useContext, useEffect, useRef, useState } from "react";
-import { MapLayContext } from "../utils/Contexts";
-import { useStateContext } from "../utils/useContexts";
+import { useEffect, useRef, useState } from "react";
+import { useMapLayerContext, useStateContext } from "../utils/useContexts";
 import L from "leaflet";
 import "leaflet-geometryutil";
 import MapTrackers from "../components/mapmonitor/MapTrackers";
@@ -12,7 +11,7 @@ L.Control.Zoom.prototype.options.position = "bottomright";
 
 const MapMonitor = () => {
   const [location, setLocation] = useState([4.2105, 101.9758]); // Default lokasi ke Malaysia
-  const { mapSelect = null } = useContext(MapLayContext) || {};
+  const {mapSelect} = useMapLayerContext();
   const { tiles, tilesLoading } = useStateContext();
   const mapRef = useRef();
 

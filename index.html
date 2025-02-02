@@ -1,13 +1,22 @@
 <!doctype html>
 <html lang="en">
+
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/ico.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LoRa Mesh Management</title>
   </head>
+
   <body>
     <div id="root"></div>
+    <script>
+      window._env_ = {
+        API_URL: "https://loramesh.mahsites.net/api/",
+        MQTT_URL: "ws://mahsites.net:8885",
+      }
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
+
 </html>

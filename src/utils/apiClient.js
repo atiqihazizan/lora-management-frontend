@@ -3,7 +3,7 @@ import axios from "axios";
 const isDebug = false;
 
 const axiosInstance = axios.create({
-  baseURL: "https://loramesh.mahsites.net/api/", // Tukar kepada URL backend anda
+  baseURL: window._env_.API_URL, // Tukar kepada URL backend anda
   headers: {
     "Content-Type": "application/json",
   },

@@ -1,4 +1,6 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
+import { useRef } from "react";
+import { XCircleIcon } from "@heroicons/react/24/solid";
 
 const InputField = ({
   id,
@@ -6,70 +8,114 @@ const InputField = ({
   type = "text",
   placeholder = "",
   value,
-  onChange = () => { }, // Fallback fungsi kosong
+  onChange = () => {},
   error,
   required = false,
-  inputClassName = "", // Custom class untuk input
-  labelClassName = "", // Custom class untuk label
-  groupClassName = "", // Custom class untuk div group
+  inputClassName = "",
+  labelClassName = "",
+  groupClassName = "",
+  accept = "",
+  onClear = null, // Fungsi untuk kosongkan input file
 }) => {
-  if (type === "hidden") {
-    // Jika tipe adalah hidden, langsung return input tanpa label atau error
-    return (
-      <input
-        id={id}
-        type="hidden"
-        value={value}
-        onChange={onChange}
-      />
-    );
-  }
+  const fileinputRef = useRef(null);
+
+  const handleClearFile = () => {
+    if(onClear) onClear();
+    if (fileinputRef.current) {
+      fileinputRef.current.value = ""; // Kosongkan nilai input file
+    }
+  };
 
   return (
     <div className={`form-group ${groupClassName}`}>
-      {/* Label */}
       {label && (
         <label
           htmlFor={id}
-          className={`block text-sm font-medium text-gray-600 mb-2 ${labelClassName}`}
-        >
+          className={`block text-sm font-medium text-gray-600 mb-2 ${labelClassName}`}>
           {label}
           {required && <span className="text-red-500"> *</span>}
         </label>
       )}
 
-      {/* Input Box */}
-      <input
-        id={id}
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        className={`w-full px-4 py-2 border ${error ? "border-red-500" : "border-gray-300"
-          } rounded-lg focus:outline-none focus:ring-2 ${error ? "focus:ring-red-500" : "focus:ring-blue-500"
+      {/* Input File */}
+      {type === "file" ? (
+        <div className="relative flex items-center">
+          <input
+            ref={fileinputRef}
+            id={id}
+            type="file"
+            onChange={onChange}
+            accept={accept}
+            className={`w-full px-4 py-2 border ${
+              error ? "border-red-500" : "border-gray-300"
+            } rounded-lg focus:outline-none focus:ring-2 ${
+              error ? "focus:ring-red-500" : "focus:ring-blue-500"
+            } focus:border-transparent ${inputClassName}`}
+          />
+          {/* Paparkan nama fail */}
+          {/* {value && (
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-sm text-gray-600">
+                Selected file: {value.name}
+              </p>
+              {onClear && (
+                <button
+                  type="button"
+                  onClick={onClear}
+                  className="text-red-500 hover:text-red-700">
+                  <XCircleIcon className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+          )} */}
+          {value && onClear && (
+            <button
+              type="button"
+              onClick={handleClearFile}
+              className="text-red-500 hover:text-red-700 absolute right-2">
+              <XCircleIcon className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+      ) : (
+        // Input biasa
+        <input
+          id={id}
+          type={type}
+          placeholder={placeholder}
+          value={value || ""}
+          onChange={onChange}
+          className={`w-full px-4 py-2 border ${
+            error ? "border-red-500" : "border-gray-300"
+          } rounded-lg focus:outline-none focus:ring-2 ${
+            error ? "focus:ring-red-500" : "focus:ring-blue-500"
           } focus:border-transparent ${inputClassName}`}
-      />
-
-      {/* Error Notice */}
-      {error && (
-        <p className="mt-1 text-sm text-red-500">{error}</p>
+        />
       )}
+
+      {/* Error Message */}
+      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
     </div>
   );
 };
 
-InputField.propTypes = {
-  id: PropTypes.string.isRequired,
-  label: PropTypes.string,
-  type: PropTypes.string,
-  placeholder: PropTypes.string,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  onChange: PropTypes.func,
-  error: PropTypes.string,
-  required: PropTypes.bool,
-  inputClassName: PropTypes.string, // Prop untuk custom class input
-  labelClassName: PropTypes.string, // Prop untuk custom class label
-  groupClassName: PropTypes.string, // Prop untuk custom class div group
-};
+// InputField.propTypes = {
+//   id: PropTypes.string.isRequired,
+//   label: PropTypes.string,
+//   type: PropTypes.string,
+//   placeholder: PropTypes.string,
+//   value: PropTypes.oneOfType([
+//     PropTypes.string,
+//     PropTypes.number,
+//     PropTypes.object,
+//   ]), // Tambah `object` untuk file
+//   onChange: PropTypes.func,
+//   error: PropTypes.string,
+//   required: PropTypes.bool,
+//   inputClassName: PropTypes.string,
+//   labelClassName: PropTypes.string,
+//   groupClassName: PropTypes.string,
+//   accept: PropTypes.string, // Untuk menentukan jenis fail yang dibenarkan
+// };
 
 export default InputField;

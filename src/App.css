@@ -244,17 +244,17 @@ body,
 }
 .btn-zoom,
 .btn-location-center {
-  @apply absolute right-[10px] z-[400] bg-white border border-gray-300 rounded-lg shadow-md;
+  @apply absolute left-[10px] z-[400] bg-white border border-gray-400 rounded shadow-md;
 }
 .btn-zoom .btn-zoom-content {
   @apply hover:bg-gray-100;
 }
 .btn-zoom .btn-zoom-content,
 .btn-location-center {
-  @apply w-[30px] h-[30px] flex items-center justify-center;
+  @apply w-[47px] h-[47px] flex items-center justify-center;
 }
 .btn-location-center {
-  @apply bottom-[80px]  hover:shadow-lg;
+  @apply bottom-[70px]  hover:shadow-lg;
   /* absolute z-[400] bottom-[80px] right-[10px] w-[30px] h-[30px] bg-white rounded-lg shadow-md flex items-center justify-center border border-gray-300 hover:shadow-lg */
 }
 .btn-flex-icon-text {
@@ -285,6 +285,11 @@ body,
 .btn-icon-danger {
   @apply px-3 py-1 border border-danger text-danger rounded-lg shadow-md hover:bg-danger-dark hover:text-white;
 }
+.btn-icon-upload {
+  @apply px-3 py-1 border border-violet-300 bg-gray-200 text-gray-600 hover:bg-gray-300 rounded shadow-md;
+}
+
+
 .button-primary {
   @apply px-3 py-1 bg-primary text-white rounded shadow-md hover:bg-primary-dark;
 }
@@ -294,6 +299,7 @@ body,
 .button-danger {
   @apply px-3 py-1 bg-danger text-white rounded shadow-md hover:bg-danger-dark;
 }
+
 .card-dialog-layer {
   @apply fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000] transition-opacity duration-300;
 }

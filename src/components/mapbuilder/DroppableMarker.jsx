@@ -13,7 +13,7 @@ const DroppableMarker = (({ marker }) => {
   const map = useMap(); // Get map instance
   const queryClient = useQueryClient();
   const { setMarkers, openMarkerDialog } = useMapContext();
-  const [center, setCenter] = useState(() => marker?.latlng.split(",").map((c) => parseFloat(c)));
+  const [center, setCenter] = useState(() => marker?.latlng);
   const radius = marker?.prop ? marker?.prop?.find(p => p.key === 'radius')?.val || 0 : 0;
 
   const onDragEnd = useCallback(
@@ -57,7 +57,7 @@ const DroppableMarker = (({ marker }) => {
 DroppableMarker.propTypes = {
   marker: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    latlng: PropTypes.string.isRequired,
+    latlng: PropTypes.array.isRequired,
     prop: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
     name: PropTypes.string,
     topic: PropTypes.string,

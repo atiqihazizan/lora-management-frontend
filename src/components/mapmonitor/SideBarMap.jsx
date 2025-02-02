@@ -2,15 +2,14 @@ import { useNavigate } from "react-router";
 import { useContext } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { isObjectNotEmpty } from "../../utils/constants";
-import { MapLayContext } from "../../utils/Contexts";
+import { useMapLayerContext, useStateContext } from "../../utils/useContexts";
 import logo from "../../assets/mesh-network.png";
 import PropTypes from "prop-types";
-import { useStateContext } from "../../utils/useContexts";
 
 const SideBarMap = ({ setIsSidebarVisible, isSidebarVisible }) => {
   const navigate = useNavigate();
   const { userInfo } = useStateContext();
-  const { setMapSelect = () => { }, mapSelect = null, boundaries = [] } = useContext(MapLayContext) || {};
+  const { setMapSelect = () => { }, mapSelect = null, boundaries = [] } = useMapLayerContext();
 
   return (
     <div className="relative">

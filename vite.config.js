@@ -48,7 +48,7 @@ export default defineConfig({
           vendor6: ["mqtt"],
           vendor5: ["leaflet"],
           vendor4: ["@geoman-io/leaflet-geoman-free", "geojson-validation"],
-          vendor3: ["react-leaflet-google-v2"],
+          // vendor3: ["react-leaflet-google-v2"],
           vendor2: [
             "leaflet-draw",
             "leaflet-geometryutil",

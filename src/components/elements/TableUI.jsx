@@ -65,10 +65,10 @@ const TableHeader = ({ columns, actionColumn, headerClassName }) => (
       {columns.map((col, index) => (
         <th
           key={index}
-          className={`px-4 py-2 text-left text-sm font-medium text-gray-500 ${col.className || ""}`}
+          className={`px-4 py-2 text-left text-sm font-medium text-gray-500 ${col.className || ""} ${col?.classNameHeader || ""}`}
           style={{ width: col.width || "auto" }}
         >
-          {col.label}
+          {col.renderHeader ? col.renderHeader(col.label) : col.label}
         </th>
       ))}
       {actionColumn && (
@@ -94,9 +94,9 @@ const TableBody = ({ data, columns, rowStyle, actionColumn }) => (
         <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 font-medium">
           {rowIndex + 1}
         </td>
-        {columns.map(({ key, render, className }, colIndex) => (
-          <td key={colIndex} className={`px-4 py-2 text-sm text-gray-900 ${className || ""}`}>
-            {render ? render(row[key], row) : row[key]}
+        {columns.map(({ key, render, className, classNameRow }, colIndex) => (
+          <td key={colIndex} className={`px-4 py-2 text-sm text-gray-900 ${className || ""} ${classNameRow || ""}`}>
+            {render ? render(row[key], row, colIndex) : row[key]}
           </td>
         ))}
         {actionColumn && (

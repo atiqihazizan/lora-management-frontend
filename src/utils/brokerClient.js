@@ -3,7 +3,7 @@ import { matchTopic } from "./constants";
 
 class BrokerClient {
   constructor() {
-    this.brokerUrl = "ws://178.128.48.114:8885";
+    this.brokerUrl = window._env_.MQTT_URL;
     this.options = {
       keepalive: 60,
       reconnectPeriod: 5000,

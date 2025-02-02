@@ -25,62 +25,45 @@ const BoundariesMap = ({ mapview }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["mapview"]);
-      // queryClient.removeQueries(["mapview"]);
     },
   });
 
-  // GeoJSON default yang valid
-  // const defaultGeoJson = { type: "FeatureCollection", features: [] };
   useEffect(() => {
-    // Validasi GeoJSON, gunakan default jika tidak valid
-    // if (!geojsonValidation.isFeatureCollection(geoJsonData)) {
-    //   console.error("Invalid GeoJSON object:", geoJsonData);
-    //   setGeoJsonData(defaultGeoJson);
-    // }
-
-    // Hapus semua layer lama sebelum menambahkan yang baru
     featureGroupRef.current.clearLayers();
 
-    // Tambahkan data GeoJSON terbaru ke featureGroup
     L.geoJSON(geoJsonData).addTo(featureGroupRef.current);
 
-    // Tambahkan featureGroup ke peta hanya sekali (jika belum ada di peta)
     if (!map.hasLayer(featureGroupRef.current)) {
       featureGroupRef.current.addTo(map);
     }
 
-    // Inisialisasi kontrol Leaflet-Geoman
     map.pm.addControls({
       position: "topleft",
       drawCircle: false,
       drawMarker: false,
     });
 
-    // Membuat custom control untuk tombol Save (hanya jika belum dibuat)
+    const saveControl = L.Control.extend({
+      onAdd: function () {
+        const button = L.DomUtil.create("button", "leaflet-bar");
+        button.innerHTML = renderToString(<MdOutlineSave className="w-5 h-5" />);
+        button.style.cursor = "pointer";
+        button.classList = "bg-white p-[.35rem] border border-gray-500 rounded shadow-md";
+
+        button.onclick = () => {
+          console.log(geoJsonData);
+          // saveGeoJson.mutateAsync({ bounding: JSON.stringify(geoJsonData) });
+        };
+
+        return button;
+      },
+    });
+
     if (!saveControlRef.current) {
-      const saveControl = L.Control.extend({
-        onAdd: function () {
-          const button = L.DomUtil.create("button", "leaflet-bar");
-          button.innerHTML = renderToString(<MdOutlineSave className="w-5 h-5" />);
-          button.style.cursor = "pointer";
-          button.classList = "bg-white p-[.35rem] border border-gray-500 rounded shadow-md";
-
-          // Menangani klik tombol
-          button.onclick = () => {
-            console.log(geoJsonData);
-            saveGeoJson.mutateAsync({ bounding: JSON.stringify(geoJsonData) });
-          };
-
-          return button;
-        },
-      });
-
-      // Simpan kontrol di dalam ref dan tambahkan ke peta
       saveControlRef.current = new saveControl({ position: "topleft" });
       map.addControl(saveControlRef.current);
     }
 
-    // Event handler untuk fitur yang dibuat
     map.on("pm:create", (e) => {
       const layer = e.layer;
       featureGroupRef.current.addLayer(layer);
@@ -114,14 +97,12 @@ const BoundariesMap = ({ mapview }) => {
       }));
     });
 
-    // Membersihkan kontrol dan event listener saat komponen dilepas
     return () => {
       map.pm.removeControls();
       map.off("pm:create");
       map.off("pm:edit");
       map.off("pm:remove");
 
-      // Menghapus kontrol dari peta jika ada
       if (saveControlRef.current) {
         map.removeControl(saveControlRef.current);
         saveControlRef.current = null;
@@ -133,7 +114,7 @@ const BoundariesMap = ({ mapview }) => {
 };
 
 BoundariesMap.propTypes = {
-  mapview: PropTypes.object.isRequired
+  mapview: PropTypes.object
 }
 
 export default BoundariesMap;
