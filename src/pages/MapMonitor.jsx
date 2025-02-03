@@ -6,50 +6,43 @@ import "leaflet-geometryutil";
 import MapTrackers from "../components/mapmonitor/MapTrackers";
 import MapMarkers from "../components/mapmonitor/MapMarkers";
 import MapBoundaries from "../components/mapmonitor/MapBoundaries";
+import { useParams } from "react-router";
+import apiClient from "../utils/apiClient";
 
 L.Control.Zoom.prototype.options.position = "bottomright";
 
 const MapMonitor = () => {
   const [center, setCenter] = useState([4.2105, 101.9758]); // Default lokasi ke Malaysia
   const [zoom, setZoom] = useState(8);
-  const {mapSelect} = useMapLayerContext();
+  const { slug } = useParams()
+  const {setMapSelect = () => { },} = useMapLayerContext();
   const { tiles, tilesLoading } = useStateContext();
   const mapRef = useRef();
 
   useEffect(() => {
-    if (mapRef.current && mapSelect?.latlng) {
-      // const buffer = 0.01; // Nilai kecil untuk buat bounding box
-      // const [lat, lng] = mapSelect.latlng;  
-      // const bounds = [
-      //   [lat - buffer, lng - buffer],
-      //   [lat + buffer, lng + buffer]
-      // ];
-    
-      // mapRef.current.fitBounds(bounds, {padding:[100, 100], animate: true });
-      mapRef.current.flyTo(mapSelect.latlng, mapSelect.zoom, { animate: true });
+    console.log
+    const getData = async () => {
+      try {
+        const {
+          boundary,
+          nodes = [],
+          geojsonData = null,
+        } = await apiClient.get("/boundaries/map/" + slug);
+        
+        const { latlng, zoom } =  boundary
+        setCenter(latlng || [4.2105, 101.9758]);
+        setZoom(zoom || 15);
+        setMapSelect(boundary)
+        mapRef.current.flyTo(latlng, zoom, { animate: true });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     }
-    setCenter(mapSelect?.latlng || [4.2105, 101.9758]);
-    setZoom(mapSelect?.zoom || 15);
 
-  }, [mapSelect]);
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     if (mapRef.current && !mapRef.current._customControlAdded) {
-  //       const customControl = L.Control.extend({
-  //         options: { position: "bottomright" },
-  //         onAdd: () => {
-  //           const container = L.DomUtil.create("div", "leaflet-bar leaflet-control");
-  //           container.innerHTML = '<button style="cursor:pointer;width:30px;height:30px;background:white;border-radius:4px;box-shadow:0 1px 5px rgba(0,0,0,0.65);"><i class="fas fa-crosshairs" style="font-size:16px;"></i></button>';
-  //           container.onclick = () => mapRef.current.setView(center, zoom, { animate: true });
-  //           return container;
-  //         },
-  //       });
-  //       mapRef.current.addControl(new customControl());
-  //       mapRef.current._customControlAdded = true;
-  //     }
-  //   }, 100);
-  // }, [center]);
+    if(slug) {
+      setTimeout(() => getData(), 500);
+    }
+  }, [slug]);
 
   return (
     <MapContainer

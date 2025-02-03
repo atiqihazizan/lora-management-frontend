@@ -1,5 +1,4 @@
-import { useNavigate } from "react-router";
-import { useContext } from "react";
+import {  useNavigate } from "react-router";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { isObjectNotEmpty } from "../../utils/constants";
 import { useMapLayerContext, useStateContext } from "../../utils/useContexts";
@@ -9,7 +8,7 @@ import PropTypes from "prop-types";
 const SideBarMap = ({ setIsSidebarVisible, isSidebarVisible }) => {
   const navigate = useNavigate();
   const { userInfo } = useStateContext();
-  const { setMapSelect = () => { }, mapSelect = null, boundaries = [] } = useMapLayerContext();
+  const { mapSelect = null, boundaries = [] } = useMapLayerContext();
 
   return (
     <div className="relative">
@@ -28,13 +27,13 @@ const SideBarMap = ({ setIsSidebarVisible, isSidebarVisible }) => {
         <img src={logo} alt="Logo" className="w-20 h-20 mb-4 mx-auto" />
         <h1 className="text-xl font-bold mb-8 text-center">LoRa Mesh Network</h1>
         <ul className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] flex-grow">
-          {boundaries?.map((boudary, index) => (
+          {boundaries?.map((boundary, index) => (
             <li
               key={index}
-              onClick={() => setMapSelect(boudary)}
-              className={`p-3 ${(isObjectNotEmpty(mapSelect) && mapSelect?.id === boudary?.id) ? 'bg-gray-600' : ''} rounded-lg hover:bg-gray-600 cursor-pointer text-[10pt]`}
+              className={`p-3 ${(isObjectNotEmpty(mapSelect) && mapSelect?.id === boundary?.id) ? 'bg-gray-600' : ''} rounded-lg hover:bg-gray-600 cursor-pointer text-[10pt]`}
+              onClick={() => navigate(`/map/${boundary.slug}`)}
             >
-              {boudary.name}
+              {boundary.name}
             </li>
           ))}
         </ul>

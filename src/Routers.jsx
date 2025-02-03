@@ -20,7 +20,8 @@ const routers = createBrowserRouter([
     path: "/map",
     element: <MapLayout />,
     children: [
-      { path: "", element: <MapMonitor /> }
+      { path: "", element: <MapMonitor /> },
+      {path:":slug", element: <MapMonitor />}
     ]
   },
   {
