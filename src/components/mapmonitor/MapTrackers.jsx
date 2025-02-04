@@ -1,5 +1,5 @@
 import { Marker, Popup } from "react-leaflet";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { matchTopicsGroup } from "../../utils/components";
 import { useMqtt } from "../../utils/useContexts";
 import L from 'leaflet';
@@ -10,54 +10,88 @@ function MapTrackers() {
   const [trackers, setTrackers] = useState([]);
 
   // Custom car icon
-  const carIcon = new L.Icon({
-    iconUrl: car, // Use the imported car icon
-    iconSize: [18, 41], // Maintain aspect ratio relative to 18px width
-    iconAnchor: [9, 41], // Centered at the bottom
-    popupAnchor: [0, -41], // Popup position relative to the icon
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png", // Optional shadow
+  const carIcon = useMemo(() => new L.Icon({
+    iconUrl: car,
+    iconSize: [18, 41],
+    iconAnchor: [9, 41],
+    popupAnchor: [0, -41],
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
     shadowSize: [41, 41],
     shadowAnchor: [13, 41],
-  });
+  }), []); // Memoize icon creation
 
   useEffect(() => {
-    const topic = 'device/location/#'
-    const subscribe = Object.entries(mqttData || {})
-    setTrackers(matchTopicsGroup(subscribe, topic))
-  }, [mqttData])
+    try {
+      const topic = 'device/location/#'
+      const subscribe = Object.entries(mqttData || {});
+      const matchedTrackers = matchTopicsGroup(subscribe, topic);
+      
+      // Validate tracker data
+      const validTrackers = matchedTrackers.filter(trk => {
+        const data = trk[1];
+        return (
+          data &&
+          typeof data.location_lat === 'number' &&
+          typeof data.location_lon === 'number' &&
+          !isNaN(data.location_lat) &&
+          !isNaN(data.location_lon) &&
+          Math.abs(data.location_lat) <= 90 &&
+          Math.abs(data.location_lon) <= 180
+        );
+      });
 
-  //   {
-  //     "location_lat": 5.3784106,
-  //     "location_lon": 100.4648049,
-  //     "speed": 14.0161,
-  //     "accuracy": 6.454999923706055,
-  //     "altitude": -1.100000023841858,
-  //     "heading": 350.129638671875,
-  //     "battery_level": 86,
-  //     "timestamp": "2025-01-15T12:58:38.732175",
-  //     "device_id": "RKQ1.201004.002",
-  //     "network_type": "Mobile",
-  //     "location_source": "GPS",
-  //     "battery_status": "discharging"
-  // }
-  return trackers.map((trk, idx) => <Marker
-    key={idx}
-    position={[trk[1].location_lat, trk[1].location_lon]}
-    icon={carIcon}>
-    <Popup>
-      <strong>Device ID:</strong> {trk[1].device_id}
-      <br />
-      <strong>Coordinates:</strong> {trk[1].location_lat}, {trk[1].location_lon}
-      <br />
-      <strong>Speed:</strong> {trk[1].speed ? `${trk[1].speed.toFixed(2)} km/h` : "N/A"}
-      <br />
-      <strong>Accuracy:</strong> {trk[1].accuracy ? `${trk[1].accuracy.toFixed(2)} m` : "N/A"}
-      <br />
-      <strong>Battery:</strong> {trk[1].battery_level ? `${trk[1].battery_level}%` : "N/A"}
-      <br />
-      <strong>Timestamp:</strong> {new Date(trk[1].timestamp).toLocaleString()}
-    </Popup>
-  </Marker>)
+      setTrackers(validTrackers);
+    } catch (error) {
+      console.error('Error processing tracker data:', error);
+      setTrackers([]);
+    }
+  }, [mqttData]);
+
+  return trackers.map((trk, idx) => {
+    const data = trk[1];
+    
+    // Format values with fallbacks
+    const formatValue = (value, decimals = 2) => {
+      return typeof value === 'number' && !isNaN(value) 
+        ? value.toFixed(decimals) 
+        : "N/A";
+    };
+
+    // Format timestamp
+    const formatTimestamp = (timestamp) => {
+      try {
+        return new Date(timestamp).toLocaleString();
+      } catch (error) {
+        return "Invalid Date";
+      }
+    };
+
+    return (
+      <Marker
+        key={`tracker-${data.device_id || idx}`}
+        position={[data.location_lat, data.location_lon]}
+        icon={carIcon}
+      >
+        <Popup>
+          <strong>Device ID:</strong> {data.device_id || "Unknown"}
+          <br />
+          <strong>Coordinates:</strong> {data.location_lat}, {data.location_lon}
+          <br />
+          <strong>Speed:</strong> {formatValue(data.speed)} km/h
+          <br />
+          <strong>Accuracy:</strong> {formatValue(data.accuracy)} m
+          <br />
+          <strong>Battery:</strong> {formatValue(data.battery_level, 0)}%
+          <br />
+          <strong>Timestamp:</strong> {formatTimestamp(data.timestamp)}
+          <br />
+          <strong>Network:</strong> {data.network_type || "N/A"}
+          <br />
+          <strong>Source:</strong> {data.location_source || "N/A"}
+        </Popup>
+      </Marker>
+    );
+  });
 }
 
 export default MapTrackers;

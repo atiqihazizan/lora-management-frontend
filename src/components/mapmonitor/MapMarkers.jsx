@@ -1,5 +1,5 @@
 import { useMap } from "react-leaflet";
-import { isObjectNotEmpty } from "../../utils/components";
+import { isObjectNotEmpty, formatLatLonToArray } from "../../utils/components";
 import { useContext, useMemo } from "react";
 import { MapLayContext } from "../../utils/Contexts.js";
 import WaveCircle from "../WaveCircle";
@@ -12,11 +12,17 @@ function MapMarkers() {
 
   const processedMarkers = useMemo(() => {
     return markers?.map((m) => {
-      const center = m?.latlng.split(",").map((c) => parseFloat(c));
-      const prop = m?.prop ? JSON.parse(m.prop) : {};
-      const radius = isObjectNotEmpty(prop) ? prop?.find((p) => p.key === 'radius')?.val || 0 : 0;
-      return { ...m, center, prop: prop, radius };
-    });
+      try {
+        // Use utility function to handle different latlng formats
+        const center = formatLatLonToArray(m?.latlng);
+        const prop = m?.prop ? (typeof m.prop === 'string' ? JSON.parse(m.prop) : m.prop) : [];
+        const radius = Array.isArray(prop) ? prop.find((p) => p.key === 'radius')?.val || 0 : 0;
+        return { ...m, center, prop, radius };
+      } catch (error) {
+        console.error('Error processing marker:', error, m);
+        return null; // Skip invalid markers
+      }
+    }).filter(Boolean); // Remove null markers
   }, [markers]);
 
   return boundaries && processedMarkers?.map((m, i) => {

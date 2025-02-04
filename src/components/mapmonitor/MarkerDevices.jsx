@@ -9,26 +9,55 @@ const MarkerDevices = ({ data }) => {
   const { center, prop, topic, ...etc } = data;
   const { mqttData } = useMqtt();
 
-  const matchedData = useMemo(() =>
-    Object.entries(mqttData).find(([t]) => matchTopic(t, (topic || ''))),
-    [mqttData, topic]
+  // Safely match MQTT topic
+  const matchedData = useMemo(() => {
+    try {
+      return Object.entries(mqttData).find(([t]) => matchTopic(t, (topic || '')));
+    } catch (error) {
+      console.error('Error matching MQTT topic:', error);
+      return null;
+    }
+  }, [mqttData, topic]);
+
+  // Safely process props with MQTT data
+  const filteredProps = useMemo(() => {
+    try {
+      if (!Array.isArray(prop)) return [];
+      
+      return matchedData
+        ? prop.map((p) => ({ 
+            ...p, 
+            val: String(matchedData[1]?.[p.key] || p.val || '') // Fixed nullish operator
+          }))
+        : prop.map(p => ({
+            ...p,
+            val: String(p.val || '') // Ensure val is string
+          }));
+    } catch (error) {
+      console.error('Error processing props:', error);
+      return [];
+    }
+  }, [prop, matchedData]);
+
+  // Validate center coordinates
+  if (!Array.isArray(center) || center.length !== 2 || 
+      !center.every(c => typeof c === 'number' && !isNaN(c))) {
+    console.error('Invalid center coordinates:', center);
+    return null;
+  }
+
+  return (
+    <Marker 
+      position={center} 
+      icon={IconMarker({ ...etc, prop: filteredProps })} 
+    />
   );
-
-  const filteredProps = useMemo(() =>
-    Array.isArray(prop) && matchedData
-      ? prop.map((p) => ({ ...p, val: matchedData[1][p.key] ?? p.val }))
-      : prop,
-    [prop, matchedData]
-  );
-
-
-  return <Marker position={center} icon={IconMarker({ ...etc, prop: filteredProps })} />;
 };
 
 MarkerDevices.propTypes = {
   data: PropTypes.shape({
     center: PropTypes.arrayOf(PropTypes.number).isRequired, // [lat, lng]
-    prop: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.array]),
+    prop: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
     topic: PropTypes.string, // MQTT topic to match
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // Optional marker ID
   }).isRequired,
