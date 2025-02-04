@@ -9,7 +9,6 @@ import DialogDevice from "../components/DialogDevice";
 const MapProvider = ({
   defaultMarkers,
   defaultGeoJson,
-  initTileLayer,
   children,
 }) => {
   const queryClient = useQueryClient();
@@ -83,15 +82,22 @@ const MapProvider = ({
     if (onClosing) onClosing();
   };
 
+  const handleDialogDelete = async (data) => {
+    try {
+      await apiClient.delete(`/nodes/${data.id}`);
+      setMarkers((prevMarkers) => prevMarkers.filter((marker) => marker.id !== data.id));
+      queryClient.invalidateQueries(["mapview", dialogData.mapid]);
+      handleDialogClose();
+    } catch (error) {
+      console.error("Failed to delete marker:", error);
+    }
+  };
+
   // Update markers state jika ada perubahan defaultMarkers
   useEffect(() => {
     if (defaultMarkers.length > 0) setMarkers(defaultMarkers);
     if (isObjectNotEmpty(defaultGeoJson)) setGeoJsonData(defaultGeoJson);
   }, [defaultMarkers, defaultGeoJson]);
-
-  useEffect(()=>{
-    setTileLayer(initTileLayer)
-  },[initTileLayer])
 
   return (
     <MapContext.Provider
@@ -117,6 +123,7 @@ const MapProvider = ({
           onClose={handleDialogClose}
           onSave={handleDialogSave}
           initialData={dialogData}
+          onDelete={handleDialogDelete}
         />
       )}
     </MapContext.Provider>

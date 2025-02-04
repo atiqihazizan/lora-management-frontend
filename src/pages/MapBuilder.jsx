@@ -11,7 +11,6 @@ import MapEditor from "../components/mapbuilder/MapEditor";
 const MapBuilder = () => {
   const { id } = useParams();
   const { devices} = useStateContext();
-  const [initTileLayer, setTileLayer] = useState();
   const [center, setCenter] = useState();
   const [nodes, setNodes] = useState([]);
   const [mapView, setMapView] = useState([]);
@@ -33,10 +32,6 @@ const MapBuilder = () => {
       setGeoJsonData(data.geojsonData);
       setMapView(data.boundary);
       setCenter (data.boundary?.latlng);
-
-      if (data.tile_url) {
-        setTileLayer(data.tile_url);
-      }
     }
   }, [data]);
 
@@ -47,7 +42,7 @@ const MapBuilder = () => {
 
   return (
     <div className="h-full flex flex-col bg-gray-600">
-      <MapProvider defaultMarkers={nodes || []} defaultGeoJson={geoJsonData} initTileLayer={initTileLayer} >
+      <MapProvider defaultMarkers={nodes || []} defaultGeoJson={geoJsonData} >
         <MapToolbar devices={devices} siteName={mapView?.name} />
         {isLoading ? (
           <div className="spinner m-auto"></div>

@@ -8,7 +8,7 @@ import Button from "./elements/Button";
 import SelectField from "./forms/SelectField";
 import { units } from "../utils/constants"; // Import units
 
-const DialogDevice = ({ fieldName = ["name", "topic"], isOpen, onClose, onSave, initialData }) => {
+const DialogDevice = ({ fieldName = ["name", "topic"], isOpen, onClose, onSave, onDelete, initialData }) => {
   const [deviceData, setDeviceData] = useState(initialData);
   const [error, setError] = useState(null);
   const [icons] = useState(() => Object.keys(ICONS).filter(i => typeof (ICONS[i]) !== 'function' && i).map(String));
@@ -47,10 +47,16 @@ const DialogDevice = ({ fieldName = ["name", "topic"], isOpen, onClose, onSave, 
     onSave(deviceData);
   };
 
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this device?")) {
+      onDelete(deviceData);
+    }
+  };
+
   const footerButtons = [
-    {
+    deviceData.id && onDelete && {
       label: "Delete",
-      onClick: onClose,
+      onClick: handleDelete,
       variant: "danger",
     },
     {
@@ -65,7 +71,7 @@ const DialogDevice = ({ fieldName = ["name", "topic"], isOpen, onClose, onSave, 
       variant: "primary",
       className: "flex-1",
     },
-  ];
+  ].filter(Boolean);
 
   return (
     <Dialog
@@ -186,6 +192,7 @@ DialogDevice.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
+  onDelete: PropTypes.func,
   initialData: PropTypes.shape({
     name: PropTypes.string,
     topic: PropTypes.string,

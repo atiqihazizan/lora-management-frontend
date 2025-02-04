@@ -4,10 +4,10 @@ import InputField from "../forms/InputField";
 import { useState } from "react";
 
 const FormDialog = ({
-  isDialogOpen,
-  editMode,
-  closeDialog,
-  handleSave,
+  open,
+  title,
+  onClose,
+  onSave,
   formData,
   setFormData,
   errors,
@@ -32,10 +32,10 @@ const FormDialog = ({
   };
   return (
     <Dialog
-      isOpen={isDialogOpen}
-      title={editMode ? "Edit Configuration" : "Add New Configuration"}
-      onClose={closeDialog}
-      onOk={handleSave}>
+      isOpen={open}
+      title={title}
+      onClose={onClose}
+      onOk={onSave}>
       <div className="flex flex-col gap-2">
         <InputField
           id="name"
@@ -79,24 +79,24 @@ const FormDialog = ({
   );
 };
 
-// FormDialog.propTypes = {
-//   isDialogOpen: PropTypes.bool.isRequired,
-//   editMode: PropTypes.bool.isRequired,
-//   closeDialog: PropTypes.func.isRequired,
-//   handleSave: PropTypes.func.isRequired,
-//   formData: PropTypes.shape({
-//     name: PropTypes.string.isRequired,
-//     latlng: PropTypes.string,
-//     zoom: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-//     path: PropTypes.oneOfType([PropTypes.object, PropTypes.string]), // Pastikan path boleh simpan fail atau string
-//   }).isRequired,
-//   setFormData: PropTypes.func.isRequired,
-//   errors: PropTypes.shape({
-//     name: PropTypes.string,
-//     latlng: PropTypes.string,
-//     zoom: PropTypes.string,
-//     path: PropTypes.string,
-//   }).isRequired,
-// };
+FormDialog.propTypes = {
+  open: PropTypes.bool.isRequired,
+  title: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  formData: PropTypes.shape({
+    name: PropTypes.string,
+    latlng: PropTypes.string,
+    zoom: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    path: PropTypes.oneOfType([PropTypes.object, PropTypes.string]), // Pastikan path boleh simpan fail atau string
+  }).isRequired,
+  setFormData: PropTypes.func.isRequired,
+  errors: PropTypes.shape({
+    name: PropTypes.string,
+    latlng: PropTypes.string,
+    zoom: PropTypes.string,
+    path: PropTypes.string,
+  }),
+};
 
 export default FormDialog;
