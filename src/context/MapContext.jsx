@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { isObjectNotEmpty } from "../../xtrash/constants";
-import { MapContext } from "../utils/Contexts";
+import { MapContext, MapLayContext } from "../utils/Contexts";
 import PropTypes from "prop-types";
 import apiClient from "../utils/apiClient";
 import DialogDevice from "../components/DialogDevice";
@@ -26,6 +26,8 @@ const MapProvider = ({
     type: "FeatureCollection",
     features: [],
   });
+  const [mapSelect, setMapSelect] = useState(null);
+  const [boundaries, setBoundaries] = useState([]);
 
   const openMarkerDialog = (markerData, onClosed) => {
     try {
@@ -163,17 +165,27 @@ const MapProvider = ({
         setCurrentTileIndex,
         boundaryFlag,
         setBoundaryFlag,
-      }}>
-      {children}
-      {showDialog && (
-        <DialogDevice
-          isOpen={showDialog}
-          onClose={handleDialogClose}
-          onSave={handleDialogSave}
-          initialData={dialogData}
-          onDelete={handleDialogDelete}
-        />
-      )}
+      }}
+    >
+      <MapLayContext.Provider
+        value={{
+          mapSelect,
+          setMapSelect,
+          boundaries,
+          setBoundaries
+        }}
+      >
+        {children}
+        {showDialog && (
+          <DialogDevice
+            isOpen={showDialog}
+            onClose={handleDialogClose}
+            onSave={handleDialogSave}
+            initialData={dialogData}
+            onDelete={handleDialogDelete}
+          />
+        )}
+      </MapLayContext.Provider>
     </MapContext.Provider>
   );
 };

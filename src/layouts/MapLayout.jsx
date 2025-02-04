@@ -31,7 +31,6 @@ const MapLayout = () => {
 
   return (
     <MapLayContext.Provider value={{ mapSelect, setMapSelect, markers, listMapView, boundaries }}>
-      <SideBarMap setIsSidebarVisible={setIsSidebarVisible} isSidebarVisible={isSidebarVisible} />
       <div className="h-full relative transition-all duration-300 ease-in-out w-full">
         <div className="relative w-full h-full">
           <Outlet />
