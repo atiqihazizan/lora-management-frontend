@@ -5,7 +5,7 @@ import { ICONS } from '../../utils/icons';
 import { Link } from 'react-router';
 import { useMapContext } from '../../utils/useContexts.js';
 
-function MapToolbar({ devices }) {
+function MapToolbar({ devices,siteName }) {
   const { boundaryFlag } = useMapContext();
   const tools = useMemo(
     () => [
@@ -36,13 +36,16 @@ function MapToolbar({ devices }) {
           </div>
         ))}
       </div>
+      <p  className='text-white text-3xl pt-1 font-bold'>{siteName}</p>
+      <div></div>
     </aside>
   );
 }
 
 MapToolbar.propTypes = {
   devices: PropTypes.arrayOf(PropTypes.object),
-  tiles: PropTypes.arrayOf(PropTypes.object),
+  // tiles: PropTypes.arrayOf(PropTypes.object),
+  siteName: PropTypes.string
 };
 
 export default MapToolbar;

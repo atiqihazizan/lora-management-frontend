@@ -6,8 +6,10 @@ import apiClient from "../utils/apiClient";
 import Loading from "../components/Loading";
 import FormDialog from "../components/boundaries/FormDialog";
 import { FaCog,  FaPencilAlt, FaTrash } from "react-icons/fa";
+import { useStateContext } from "../utils/useContexts";
 
 const Boundaries = () => {
+  const { userInfo } = useStateContext();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -21,8 +23,8 @@ const Boundaries = () => {
   });
 
   const saveMutation = useMutation({
-    mutationFn: ({ id, name }) => {
-      const newdata = { id, name };
+    mutationFn: ({ id, name, latlng, zoom }) => {
+      const newdata = { id, name, latlng, zoom , userid: userInfo.user_id };
       const method = editMode ? "put" : "post";
       const url = editMode ? `/boundaries/${id}` : "/boundaries";
       return apiClient[method](url, newdata);
@@ -35,7 +37,7 @@ const Boundaries = () => {
   });
 
   const openDialog = (row = null) => {
-    const { path, fileExist, id, ...rest } = row || {};
+    const { path = "", ...rest } = row || {};
     setEditMode(!!row);
     setFormData(rest || { name: "", latlng: "", zoom: 17 });
     setErrors({});
@@ -51,12 +53,11 @@ const Boundaries = () => {
   };
 
   const handleSave = async () => {
-    return console.log(formData);
-  
+    
     // Validasi Nama, LatLng & Zoom
     const newErrors = {
       name: formData.name.trim() ? "" : "Name is required.",
-      latlng: /^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(formData.latlng.trim()) ? "" : "Invalid latlng format.",
+      latlng: /^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(formData.latlng.replaceAll(" ", "").trim()) ? "" : "Invalid latlng format.",
       zoom: !isNaN(formData.zoom) && formData.zoom > 0 ? "" : "Zoom must be a positive number.",
     };
   
@@ -89,7 +90,7 @@ const Boundaries = () => {
       .join(",");
   
     // Simpan data (ini boleh disesuaikan dengan API atau local state)
-    // await saveMutation.mutateAsync({ ...formData, latlng: formattedLatlng });
+    await saveMutation.mutateAsync({ ...formData, latlng: formattedLatlng });
   
     return false;
   };
@@ -103,16 +104,14 @@ const Boundaries = () => {
       key: "action",
       label: "Action",
       className: "text-center !w-32 pr-0",
-      render: (data, row, index) => {
+      render: (data, row) => {
         return (
           <div className="flex items-center justify-end gap-2">
-            {row.fileExist && (
-              <button
-                className="btn-icon-secondary"
-                onClick={() => navigate(`/builder/${row.id}`)}>
-                <FaCog />
-              </button>
-            )}
+            <button
+              className="btn-icon-secondary"
+              onClick={() => navigate(`/builder/${row.id}`)}>
+              <FaCog />
+            </button>
             <button
               className="btn-icon-primary"
               onClick={() => openDialog(row)}>

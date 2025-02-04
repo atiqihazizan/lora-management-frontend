@@ -30,6 +30,7 @@ const MapBuilder = () => {
   // Gabungkan semua kesan apabila `data` berubah
   useEffect(() => {
     if (data) {
+      console.log(data)
       setNodes(data.nodes);
       setGeoJsonData(data.geojsonData);
       setMapView(data.boundary);
@@ -57,7 +58,7 @@ const MapBuilder = () => {
   return (
     <div className="h-full flex flex-col bg-gray-600">
       <MapProvider defaultMarkers={nodes || []} defaultGeoJson={geoJsonData} initTileLayer={initTileLayer} >
-        <MapToolbar devices={devices} />
+        <MapToolbar devices={devices} siteName={mapView?.name} />
         {isLoading ? (
           <div className="spinner m-auto"></div>
         ) : isError ? (
