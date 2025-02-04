@@ -78,23 +78,23 @@ const Boundaries = () => {
         size: 50,
         minSize: 50,
         maxSize: 50,
-        headerClassName: 'font-bold text-gray-600 text-center',
+        headerClassName: 'font-bold text-gray-600 text-right pr-8',
         cell: ({ row }) => (
-          <div className="flex items-center justify-end gap-1 px-2">
+          <div className="flex items-center justify-end gap-1 pr-6">
             <button
-              className="btn-icon-secondary p-1"
+              className="btn-icon-secondary p-1 hover:bg-gray-100"
               onClick={() => navigate(`/builder/${row.original.id}`)}
               title="Open in Builder">
               <FaCog size={14} />
             </button>
             <button
-              className="btn-icon-primary p-1"
+              className="btn-icon-primary p-1 hover:bg-blue-100"
               onClick={() => openDialog(row.original)}
               title="Edit">
               <FaPencilAlt size={14} />
             </button>
             <button
-              className="btn-icon-danger p-1"
+              className="btn-icon-danger p-1 hover:bg-red-100"
               onClick={() => handleDelete(row.original.id)}
               title="Delete">
               <FaTrash size={14} />

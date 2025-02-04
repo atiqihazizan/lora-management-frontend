@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { isObjectNotEmpty, latlngToString } from "../../xtrash/constants";
+import { isObjectNotEmpty } from "../../xtrash/constants";
 import { MapContext } from "../utils/Contexts";
 import PropTypes from "prop-types";
 import apiClient from "../utils/apiClient";
 import DialogDevice from "../components/DialogDevice";
+import { formatLatLonToArray, latlngToString } from "../utils/components";
 
 const MapProvider = ({
   defaultMarkers,
@@ -27,52 +28,99 @@ const MapProvider = ({
   });
 
   const openMarkerDialog = (markerData, onClosed) => {
-    const newProp = (() => {
-      try {
-        return JSON.parse(markerData?.prop || "[]");
-      } catch (error) {
-        console.error("Failed to parse prop data:", error);
-        return [];
-      }
-    })();
-    const newDataMarker = { ...markerData, prop: newProp };
-    setEditMode(newDataMarker.id !== undefined);
-    setDialogData(newDataMarker);
-    setShowDialog(true);
-    if (onClosed) setOnClosing(() => onClosed);
-    // setIsDragging(false);
+    try {
+      // Parse prop data if it's a string
+      const newProp = typeof markerData?.prop === 'string' 
+        ? JSON.parse(markerData.prop || "[]")
+        : (markerData?.prop || []);
+
+      // Format marker data
+      const newDataMarker = { 
+        ...markerData, 
+        // Ensure prop values are strings
+        prop: newProp.map(p => ({
+          ...p,
+          val: String(p.val || '')
+        })),
+        // Ensure latlng is in string format for dialog
+        latlng: Array.isArray(markerData?.latlng) 
+          ? markerData.latlng.join(',') 
+          : markerData?.latlng || ""
+      };
+
+      setEditMode(newDataMarker.id !== undefined);
+      setDialogData(newDataMarker);
+      setShowDialog(true);
+      if (onClosed) setOnClosing(() => onClosed);
+    } catch (error) {
+      console.error("Error preparing marker data:", error);
+      // Handle error appropriately
+    }
   };
 
   const saveMutation = useMutation({
     mutationFn: async (data) => {
-      const method = editMode ? "put" : "post";
-      const url = editMode ? `/nodes/${dialogData.id}` : "/nodes";
-      const result = await apiClient[method](url, data);
-      return { result, data: data };
+      try {
+        const method = editMode ? "put" : "post";
+        const url = editMode ? `/nodes/${dialogData.id}` : "/nodes";
+
+        // Format data for API
+        const apiData = {
+          ...data,
+          // Convert latlng to array for API
+          latlng: latlngToString(data.latlng),
+          // Stringify prop for API if it's not already a string
+          prop: typeof data.prop === 'string' ? data.prop : JSON.stringify(data.prop)
+        };
+
+        const result = await apiClient[method](url, apiData);
+        return { result, data: apiData };
+      } catch (error) {
+        console.error("Error saving marker:", error);
+        throw error;
+      }
     },
     onSuccess: ({ result, data }) => {
-      const newData = { ...data, prop: JSON.parse(data.prop) };
-      if (editMode) {
-        setMarkers((prevMarkers) =>
-          prevMarkers.map((marker) =>
-            marker.id === newData.id ? newData : marker
-          )
-        );
-      } else {
-        data.id = result.newId;
-        setMarkers((prevMarkers) => [...prevMarkers, data]);
+      try {
+        // Format data for state update
+        const newData = {
+          ...data,
+          id: editMode ? data.id : result.newId,
+          // Parse prop back to array if it's a string
+          prop: typeof data.prop === 'string' ? JSON.parse(data.prop) : data.prop,
+          // Keep latlng as array for map display
+          latlng: Array.isArray(data.latlng) ? data.latlng : formatLatLonToArray(data.latlng)
+        };
+
+        // Update markers state
+        if (editMode) {
+          setMarkers((prevMarkers) =>
+            prevMarkers.map((marker) =>
+              marker.id === newData.id ? newData : marker
+            )
+          );
+        } else {
+          setMarkers((prevMarkers) => [...prevMarkers, newData]);
+        }
+
+        // Invalidate queries and close dialog
+        queryClient.invalidateQueries(["mapview", dialogData.mapid]);
+        handleDialogClose();
+        return newData;
+      } catch (error) {
+        console.error("Error processing save result:", error);
+        throw error;
       }
-      queryClient.invalidateQueries(["mapview", dialogData.mapid]);
-      // queryClient.removeQueries(['mapview', dialogData.mapid]);
-      handleDialogClose();
-      // notify("error", "Login failed. Please check your credentials.");
-      return data;
     },
   });
 
   const handleDialogSave = async (pendingData) => {
-    const reqData = { ...pendingData, latlng: latlngToString(pendingData.latlng), prop: JSON.stringify(pendingData.prop) };
-    saveMutation.mutateAsync(reqData);
+    try {
+      await saveMutation.mutateAsync(pendingData);
+    } catch (error) {
+      console.error("Error in handleDialogSave:", error);
+      // Handle error appropriately
+    }
   };
 
   const handleDialogClose = () => {
