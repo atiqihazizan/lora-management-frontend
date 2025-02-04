@@ -2,7 +2,7 @@ import IconMarker from "../IconMarker";
 import PropTypes from "prop-types";
 import { Marker } from "react-leaflet";
 import { useMemo } from "react";
-import { matchTopic } from "../../utils/constants";
+import { matchTopic } from "../../utils/components";
 import { useMqtt } from "../../utils/useContexts";
 
 const MarkerDevices = ({ data }) => {

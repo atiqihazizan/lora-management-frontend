@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import { useStateContext } from "../utils/useContexts";
 import MapProvider from "../context/MapContext"; // Import DragProvider
 import apiClient from "../utils/apiClient";
-import DroppableMap from "../components/mapbuilder/DroppableMap";
 import MapToolbar from "../components/mapbuilder/MapToolbar";
 import Loading from "../components/Loading";
-import L from 'leaflet';
+import MapEditor from "../components/mapbuilder/MapEditor";
 
 const MapBuilder = () => {
   const { id } = useParams();
@@ -30,22 +29,13 @@ const MapBuilder = () => {
   // Gabungkan semua kesan apabila `data` berubah
   useEffect(() => {
     if (data) {
-      console.log(data)
       setNodes(data.nodes);
       setGeoJsonData(data.geojsonData);
       setMapView(data.boundary);
+      setCenter (data.boundary?.latlng);
 
       if (data.tile_url) {
         setTileLayer(data.tile_url);
-      }
-
-      if (data.geojsonData) {
-        const geoJsonLayer = L.geoJSON(data.geojsonData);
-        const bounds = geoJsonLayer.getBounds();
-        if (bounds.isValid()) {
-          const { lat, lng } = bounds.getCenter();
-          setCenter([lat, lng]);
-        }
       }
     }
   }, [data]);
@@ -69,7 +59,7 @@ const MapBuilder = () => {
             </button>
           </div>
         ) :
-        center && <DroppableMap id={id} mapview={mapView} center={center} />
+        center && <MapEditor data={mapView} />
         }
       </MapProvider>
     </div>

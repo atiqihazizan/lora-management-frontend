@@ -1,7 +1,7 @@
 import { useDrop } from "react-dnd";
 import { v4 as uuidv4 } from "uuid";
 import { useMapEvents } from "react-leaflet";
-import { formatLatLong } from "../../utils/constants";
+import { formatLatLong } from "../../../xtrash/constants";
 import { useMapContext } from "../../utils/useContexts";
 import PropTypes from "prop-types";
 
@@ -44,7 +44,7 @@ const DroppableAdded = ({ accept, mapid }) => {
 
 DroppableAdded.propTypes = {
   accept: PropTypes.string.isRequired,
-  mapid: PropTypes.string.isRequired,
+  mapid: PropTypes.number.isRequired,
 };
 
 export default DroppableAdded;

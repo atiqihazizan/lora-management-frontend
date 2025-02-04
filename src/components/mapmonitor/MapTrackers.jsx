@@ -1,6 +1,6 @@
 import { Marker, Popup } from "react-leaflet";
 import { useEffect, useState } from "react";
-import { matchTopicsGroup } from "../../utils/constants";
+import { matchTopicsGroup } from "../../utils/components";
 import { useMqtt } from "../../utils/useContexts";
 import L from 'leaflet';
 import car from "../../assets/car1.png";
@@ -8,13 +8,6 @@ import car from "../../assets/car1.png";
 function MapTrackers() {
   const { mqttData } = useMqtt()
   const [trackers, setTrackers] = useState([]);
-
-  // delete L.Icon.Default.prototype._getIconUrl;
-  // L.Icon.Default.mergeOptions({
-  //   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  //   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  //   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  // });
 
   // Custom car icon
   const carIcon = new L.Icon({

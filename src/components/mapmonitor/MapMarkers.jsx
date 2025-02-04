@@ -1,5 +1,5 @@
 import { useMap } from "react-leaflet";
-import { isObjectNotEmpty } from "../../utils/constants";
+import { isObjectNotEmpty } from "../../utils/components";
 import { useContext, useMemo } from "react";
 import { MapLayContext } from "../../utils/Contexts.js";
 import WaveCircle from "../WaveCircle";

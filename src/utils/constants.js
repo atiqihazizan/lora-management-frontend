@@ -1,0 +1,16 @@
+export const units = [
+  { label: "Celsius", id: "celsius", symbol: "°C" },
+  { label: "Fahrenheit", id: "fahrenheit", symbol: "°F" },
+  { label: "Kelvin", id: "kelvin", symbol: "K" },
+  { label: "Percent", id: "percent", symbol: "%" },
+  { label: "Pascal", id: "pascal", symbol: "Pa" },
+  { label: "Bar", id: "bar", symbol: "bar" },
+  { label: "Meter", id: "meter", symbol: "m" },
+  { label: "Kilometer", id: "kilometer", symbol: "km" },
+  { label: "Centimeter", id: "centimeter", symbol: "cm" },
+  { label: "Millimeter", id: "millimeter", symbol: "mm" },
+  { label: "Mile", id: "mile", symbol: "mi" },
+  { label: "Yard", id: "yard", symbol: "yd" },
+  { label: "Foot", id: "foot", symbol: "ft" },
+  { label: "Inch", id: "inch", symbol: "in" },
+];

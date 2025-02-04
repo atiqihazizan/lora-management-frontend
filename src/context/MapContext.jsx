@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { isObjectNotEmpty } from "../utils/constants";
+import { isObjectNotEmpty, latlngToString } from "../../xtrash/constants";
 import { MapContext } from "../utils/Contexts";
 import PropTypes from "prop-types";
 import apiClient from "../utils/apiClient";
@@ -72,7 +72,7 @@ const MapProvider = ({
   });
 
   const handleDialogSave = async (pendingData) => {
-    const reqData = { ...pendingData, prop: JSON.stringify(pendingData.prop) };
+    const reqData = { ...pendingData, latlng: latlngToString(pendingData.latlng), prop: JSON.stringify(pendingData.prop) };
     saveMutation.mutateAsync(reqData);
   };
 

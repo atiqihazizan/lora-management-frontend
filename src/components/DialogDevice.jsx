@@ -6,40 +6,12 @@ import Dialog from "./Dialog";
 import InputField from "./forms/InputField";
 import Button from "./elements/Button";
 import SelectField from "./forms/SelectField";
+import { units } from "../utils/constants"; // Import units
 
 const DialogDevice = ({ fieldName = ["name", "topic"], isOpen, onClose, onSave, initialData }) => {
   const [deviceData, setDeviceData] = useState(initialData);
   const [error, setError] = useState(null);
   const [icons] = useState(() => Object.keys(ICONS).filter(i => typeof (ICONS[i]) !== 'function' && i).map(String));
-  const units = [
-    // Units for sensor (temperature, pressure, humidity, etc.)
-    { label: "Celsius", id: "celsius", symbol: "°C" },
-    { label: "Fahrenheit", id: "fahrenheit", symbol: "°F" },
-    { label: "Kelvin", id: "kelvin", symbol: "K" },
-    { label: "Percent", id: "percent", symbol: "%" },
-    { label: "Pascal", id: "pascal", symbol: "Pa" },
-    { label: "Bar", id: "bar", symbol: "bar" },
-
-    // Units for distance and radius
-    { label: "Meter", id: "meter", symbol: "m" },
-    { label: "Kilometer", id: "kilometer", symbol: "km" },
-    { label: "Centimeter", id: "centimeter", symbol: "cm" },
-    { label: "Millimeter", id: "millimeter", symbol: "mm" },
-    { label: "Mile", id: "mile", symbol: "mi" },
-    { label: "Yard", id: "yard", symbol: "yd" },
-    { label: "Foot", id: "foot", symbol: "ft" },
-    { label: "Inch", id: "inch", symbol: "in" },
-
-    // Units for radius (same as distance, but specific context)
-    // { label: "Meter (Radius)", id: "radius_meter", symbol: "m" },
-    // { label: "Kilometer (Radius)", id: "radius_kilometer", symbol: "km" },
-
-    // Units for season (categorical)
-    // { label: "Spring", id: "spring", symbol: "Spring" },
-    // { label: "Summer", id: "summer", symbol: "Summer" },
-    // { label: "Autumn", id: "autumn", symbol: "Autumn" },
-    // { label: "Winter", id: "winter", symbol: "Winter" },
-  ];
 
   const handleChange = (field) => (e) => {
     const value = e.target.value;
@@ -65,7 +37,6 @@ const DialogDevice = ({ fieldName = ["name", "topic"], isOpen, onClose, onSave, 
   };
 
   const handleSave = () => {
-    // if (!deviceData.name || !deviceData.topic) {
     if (!deviceData.name) return setError("Please fill in all required fields.");
 
     const hasEmptyFeature = deviceData.prop.some(
@@ -74,15 +45,34 @@ const DialogDevice = ({ fieldName = ["name", "topic"], isOpen, onClose, onSave, 
     if (hasEmptyFeature) return setError("Please fill in all fields for each feature.");
 
     onSave(deviceData);
-    // onClose();
   };
+
+  const footerButtons = [
+    {
+      label: "Delete",
+      onClick: onClose,
+      variant: "danger",
+    },
+    {
+      label: "Cancel",
+      onClick: onClose,
+      variant: "secondary",
+      className: "flex-1",
+    },
+    {
+      label: "Save",
+      onClick: handleSave,
+      variant: "primary",
+      className: "flex-1",
+    },
+  ];
 
   return (
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
       title={initialData ? "Edit Marker" : "Add Marker"}
-      onOk={handleSave}
+      footerButtons={footerButtons}
       width="1100px"
     >
 
@@ -200,16 +190,8 @@ DialogDevice.propTypes = {
     name: PropTypes.string,
     topic: PropTypes.string,
     icon: PropTypes.string,
-    latlng: PropTypes.string,
-    prop: PropTypes.oneOfType([PropTypes.string, PropTypes.array, PropTypes.object]),
-    // prop: PropTypes.arrayOf(
-    //   PropTypes.shape({
-    //     label: PropTypes.string,
-    //     key: PropTypes.string,
-    //     val: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    //     unit: PropTypes.string,
-    //   })
-    // ),
+    latlng: PropTypes.oneOfType([PropTypes.string, PropTypes.array]), // updated to accept both string and array
+    prop: PropTypes.oneOfType([PropTypes.string, PropTypes.array, PropTypes.object]), // updated to accept string, array, or object
   }),
 };
 

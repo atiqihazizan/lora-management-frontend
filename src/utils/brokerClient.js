@@ -1,5 +1,5 @@
 import mqtt from "mqtt";
-import { matchTopic } from "./constants";
+import { matchTopic } from "./components.js";
 
 class BrokerClient {
   constructor() {

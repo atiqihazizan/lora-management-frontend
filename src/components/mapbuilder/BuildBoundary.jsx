@@ -12,21 +12,21 @@ import "@geoman-io/leaflet-geoman-free";
 import apiClient from "../../utils/apiClient";
 // import geojsonValidation from "geojson-validation";
 
-const BoundariesMap = ({ mapview }) => {
+const BuildBoundary = ({ id }) => {
   const queryClient = useQueryClient();
   const map = useMap();
   const { geoJsonData, setGeoJsonData } = useMapContext();
   const featureGroupRef = useRef(L.featureGroup());
   const saveControlRef = useRef(null);
 
-  const saveGeoJson = useMutation({
-    mutationFn: (data) => {
-      return apiClient.put(`/mapview/${mapview.id}`, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["mapview"]);
-    },
-  });
+  // const saveGeoJson = useMutation({
+  //   mutationFn: (data) => {
+  //     return apiClient.put(`/mapview/${id}`, data);
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries(["mapview"]);
+  //   },
+  // });
 
   useEffect(() => {
     featureGroupRef.current.clearLayers();
@@ -113,8 +113,8 @@ const BoundariesMap = ({ mapview }) => {
   return null;
 };
 
-BoundariesMap.propTypes = {
-  mapview: PropTypes.object
+BuildBoundary.propTypes = {
+  id: PropTypes.number
 }
 
-export default BoundariesMap;
+export default BuildBoundary;

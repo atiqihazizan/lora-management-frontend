@@ -1,6 +1,6 @@
 import { Marker, useMap } from "react-leaflet";
 import { useState, useCallback } from "react";
-import { formatLatLong } from "../../utils/constants";
+import { formatLatLong, latlngToArray } from "../../utils/components";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMapContext } from "../../utils/useContexts";
 import PropTypes from "prop-types";
@@ -9,12 +9,12 @@ import apiClient from "../../utils/apiClient";
 import React from "react";
 import WaveCircle from "../WaveCircle";
 
-const DroppableMarker = (({ marker }) => {
+const MarkerDraggable = (({ marker }) => {
   const map = useMap(); // Get map instance
   const queryClient = useQueryClient();
   const { setMarkers, openMarkerDialog } = useMapContext();
   const [center, setCenter] = useState(() => marker?.latlng);
-  const radius = marker?.prop ? marker?.prop?.find(p => p.key === 'radius')?.val || 0 : 0;
+  const radius = Array.isArray(marker?.prop) ? marker?.prop?.find(p => p.key === 'radius')?.val || 0 : 0;
 
   const onDragEnd = useCallback(
     (e) => {
@@ -24,7 +24,7 @@ const DroppableMarker = (({ marker }) => {
 
       apiClient.put(`/nodes/${marker.id}`, { latlng: newLatLng }).then(() => {
         setMarkers((prev) =>
-          prev.map((m) => (m.id === marker.id ? { ...m, latlng: newLatLng } : m))
+          prev.map((m) => (m.id === marker.id ? { ...m, latlng: latlngToArray(newLatLng) } : m))
         );
         queryClient.invalidateQueries(["mapview", marker.id]);
       });
@@ -54,10 +54,10 @@ const DroppableMarker = (({ marker }) => {
   );
 });
 
-DroppableMarker.propTypes = {
+MarkerDraggable.propTypes = {
   marker: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    latlng: PropTypes.array.isRequired,
+    latlng: PropTypes.oneOfType([PropTypes.string, PropTypes.array]).isRequired,
     prop: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
     name: PropTypes.string,
     topic: PropTypes.string,
@@ -66,4 +66,4 @@ DroppableMarker.propTypes = {
   accept: PropTypes.string.isRequired,
 };
 
-export default React.memo(DroppableMarker);
+export default React.memo(MarkerDraggable);

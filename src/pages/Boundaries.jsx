@@ -9,8 +9,8 @@ import { FaCog,  FaPencilAlt, FaTrash } from "react-icons/fa";
 import { useStateContext } from "../utils/useContexts";
 
 const Boundaries = () => {
-  const { userInfo } = useStateContext();
   const navigate = useNavigate();
+  const { userInfo } = useStateContext();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({ name: "", latlng: "", zoom: 17 });
@@ -37,7 +37,20 @@ const Boundaries = () => {
   });
 
   const openDialog = (row = null) => {
-    const { path = "", ...rest } = row || {};
+    const { path , ...rest } = row || {};
+    void path;
+
+  //   {
+  //     "id": 1,
+  //     "name": "Ladang Kota Bahagia",
+  //     "path": "/geojson/ladang-kota-bahagia.json",
+  //     "status": 1,
+  //     "zoom": 15,
+  //     "latlng": "2.979078,102.928747",
+  //     "slug": "ladang-kota-bahagia"
+  // }
+  
+    console.log(row)
     setEditMode(!!row);
     setFormData(rest || { name: "", latlng: "", zoom: 17 });
     setErrors({});

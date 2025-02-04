@@ -1,6 +1,6 @@
 import {  useNavigate } from "react-router";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { isObjectNotEmpty } from "../../utils/constants";
+import { isObjectNotEmpty } from "../../utils/components";
 import { useMapLayerContext, useStateContext } from "../../utils/useContexts";
 import logo from "../../assets/mesh-network.png";
 import PropTypes from "prop-types";
