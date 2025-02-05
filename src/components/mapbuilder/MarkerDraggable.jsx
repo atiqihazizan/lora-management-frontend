@@ -43,7 +43,7 @@ const MarkerDraggable = (({ marker }) => {
 
   return (
     <>
-      <Marker position={center} icon={IconMarker({ ...marker, prop: marker.prop })} draggable={true} eventHandlers={{
+      <Marker position={center} icon={IconMarker({ ...marker, prop: marker?.prop })} draggable={true} eventHandlers={{
         dragend: onDragEnd,
         dblclick: editMarker,
         mousedown: handleMouseDown,

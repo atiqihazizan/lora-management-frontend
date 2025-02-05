@@ -57,7 +57,7 @@ const MapEditor = ({ data }) => {
         </LayersControl>
 
         {markers?.map((marker, i) => (
-          <DroppableMarker key={i} data={marker} />
+          <DroppableMarker key={i} marker={marker} accept="marker" />
         ))}
 
         <BuildBoundary />
