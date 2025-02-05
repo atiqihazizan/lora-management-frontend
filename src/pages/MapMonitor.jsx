@@ -1,12 +1,12 @@
-import { MapContainer, TileLayer, ZoomControl, LayersControl } from "react-leaflet";
+import { MapContainer, TileLayer, ZoomControl, LayersControl} from "react-leaflet";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMapLayerContext, useStateContext } from "../utils/useContexts";
 import MapBoundaries from "../components/mapmonitor/MapBoundaries";
 import MapMarkers from "../components/mapmonitor/MapMarkers";
 import MapTrackers from "../components/mapmonitor/MapTrackers";
-import SideBarMap from "../components/mapmonitor/SideBarMap";
 import BoundaryMarker from "../components/mapmonitor/BoundaryMarker";
+import SideBarMap from "../components/mapmonitor/SideBarMap";
 import apiClient from "../utils/apiClient";
 
 const DEFAULT_CENTER = [4.5141, 102.0511]; // Adjusted more west between Kelantan and Pahang
@@ -14,8 +14,8 @@ const DEFAULT_ZOOM = 8;
 
 // Fly to options for smoother animation
 const flyToOptions = {
-  duration: 2.5, // Longer duration
-  easeLinearity: 0.1, // More smooth easing
+  duration: 2.5,
+  easeLinearity: 0.1,
 };
 
 function MapMonitor() {
@@ -28,7 +28,7 @@ function MapMonitor() {
   const [center, setCenter] = useState(DEFAULT_CENTER);
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
 
-  // Fetch boundaries data
+  // Fetch boundaries on mount
   useEffect(() => {
     const fetchBoundaries = async () => {
       try {
@@ -39,7 +39,7 @@ function MapMonitor() {
       }
     };
     fetchBoundaries();
-  }, [setBoundaries]);
+  }, []);
 
   // Parse latlng string to array
   const parseLatlng = (latlng) => {
@@ -53,41 +53,48 @@ function MapMonitor() {
     return null;
   };
 
+  // Function to handle flying to location
+  const flyToLocation = (coords, zoom = DEFAULT_ZOOM, boundary = null) => {
+    mapRef.current?.flyTo(coords, zoom, {
+      ...flyToOptions,
+      complete: () => {
+        setSelectedBoundary(boundary ? { ...boundary, center: coords } : null);
+      }
+    });
+  };
+
   // Effect to handle flying to boundary when slug changes
   useEffect(() => {
     if (!mapRef.current) return;
 
+    // If no slug, fly to default center
     if (!slug) {
-      // If no slug, zoom out to default center
-      mapRef.current.flyTo(DEFAULT_CENTER, DEFAULT_ZOOM, flyToOptions);
+      flyToLocation(DEFAULT_CENTER);
       return;
     }
 
-    // If has slug, find and fly to boundary
+    // If no boundaries yet, do nothing
     if (!boundaries) return;
+
+    // Find boundary by slug
     const boundary = boundaries.find(b => b.slug === slug);
     if (!boundary) {
-      // If boundary not found, zoom out to default center
-      mapRef.current.flyTo(DEFAULT_CENTER, DEFAULT_ZOOM, flyToOptions);
+      flyToLocation(DEFAULT_CENTER);
       return;
     }
 
+    // Parse coordinates
     const coords = parseLatlng(boundary.latlng);
     if (!coords) {
       console.error('Invalid boundary latlng:', boundary);
-      // If invalid coords, zoom out to default center
-      mapRef.current.flyTo(DEFAULT_CENTER, DEFAULT_ZOOM, flyToOptions);
+      flyToLocation(DEFAULT_CENTER);
       return;
     }
 
     // Fly to boundary location
-    mapRef.current.flyTo(coords, boundary.zoom || 15, flyToOptions);
-  }, [slug, boundaries]);
-
-  // Handle boundary selection from sidebar
-  const handleBoundarySelect = (boundary) => {
+    flyToLocation(coords, boundary.zoom || 15, boundary);
     setSelectedBoundary(boundary);
-  };
+  }, [slug, boundaries]);
 
   return (
     <div className="relative h-screen">
@@ -95,7 +102,6 @@ function MapMonitor() {
         isSidebarVisible={isSidebarVisible}
         setIsSidebarVisible={setIsSidebarVisible}
         mapRef={mapRef}
-        onBoundarySelect={handleBoundarySelect}
       />
       <MapContainer
         ref={mapRef}
@@ -116,10 +122,10 @@ function MapMonitor() {
           </LayersControl>
         )}
 
-        <MapBoundaries />
+        {/* <MapBoundaries /> */}
         <MapMarkers />
-        <MapTrackers />
-        {selectedBoundary && selectedBoundary.center && (
+        {/* <MapTrackers /> */}
+        {selectedBoundary && selectedBoundary.latlng && (
           <BoundaryMarker boundary={selectedBoundary} />
         )}
         <ZoomControl position="topright" />
