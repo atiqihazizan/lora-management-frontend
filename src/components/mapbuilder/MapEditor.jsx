@@ -1,110 +1,96 @@
-import React, { useEffect } from "react";
-import PropTypes from "prop-types";
-import {
-  LayersControl,
-  MapContainer,
-  Marker,
-  Popup,
-  TileLayer,
-  ZoomControl,
-} from "react-leaflet";
-import { useMapContext, useStateContext } from "../../utils/useContexts.js";
-import { FaLocationCrosshairs } from "react-icons/fa6";
-import "leaflet/dist/leaflet.css";
-import "leaflet-routing-machine";
-import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+import { MapContainer, TileLayer, LayersControl, ZoomControl } from "react-leaflet";
 import L from "leaflet";
-import DroppableAdded from "./DroppableAdded.jsx";
+import { useEffect, useCallback } from "react";
+import { FaLocationCrosshairs } from "react-icons/fa6";
+import { useStateContext, useMapContext } from "../../utils/useContexts";
 import DroppableMarker from "./MarkerDraggable.jsx";
 import BuildBoundary from "./BuildBoundary.jsx";
 import useHandleMapEditor from "./useHandleMapEditor";
+import BoundaryMarker from "./BoundaryMarker.jsx";
 
 const MapEditor = ({ data }) => {
   const { zoom, id, latlng, name } = data || {};
-  const { userInfo, tiles } = useStateContext();
+  const { tiles } = useStateContext();
   const { markers } = useMapContext();
-  const { handleDragEnd, handleToCenter, mainMapRef, markerRef } = useHandleMapEditor(id, latlng, userInfo);
+  const { handleDragEnd, handleToCenter, mainMapRef } = useHandleMapEditor(id, latlng);
 
-  delete L.Icon.Default.prototype._getIconUrl;
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl:
-      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  });
+  // Handle boundary marker drag end
+  const onBoundaryDragEnd = useCallback((lat, lng) => {
+    if (typeof lat !== "number" || typeof lng !== "number") {
+      console.error('Invalid coordinates:', { lat, lng });
+      return;
+    }
+    handleDragEnd(lat, lng);
+  }, [handleDragEnd]);
 
-  useEffect(() => {
-    setTimeout(() => markerRef.current.openPopup(), 100);
-  }, []);
+  // Set default marker icon
+  // useEffect(() => {
+  //   delete L.Icon.Default.prototype._getIconUrl;
+  //   L.Icon.Default.mergeOptions({
+  //     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  //     iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  //     shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  //   });
+  // }, []);
 
-  if (!tiles || !markers) return <></>;
+  if (!tiles || !markers || !data) {
+    console.error('Missing required data:', { tiles, markers, data });
+    return null;
+  }
   return (
     <div className="relative h-full w-full">
-      <>
-        <MapContainer
-          className="h-full w-full flex-1 mainmap"
-          ref={mainMapRef}
-          center={latlng}
-          zoom={zoom || 15}
-          attributionControl={false}
-          zoomControl={false}
-          scrollWheelZoom={false}
-          doubleClickZoom={false}
-          dragging={false}
-          touchZoom={false}
-          whenReady={(map) => {
-            mainMapRef.current = map;
-          }}>
-          {tiles && (
-            <LayersControl position="bottomleft">
-              {tiles.map((tile, idx) => (
-                <LayersControl.BaseLayer
-                  key={`tile_${idx}`}
-                  checked={idx === 0}
-                  name={tile.name}>
-                  <TileLayer url={tile.url} attribution="&copy;contributo" />
-                </LayersControl.BaseLayer>
-              ))}
-            </LayersControl>
-          )}
-
-          <DroppableAdded accept="point" mapid={id} />
-          <BuildBoundary id={id} />
-
-          {markers.map((marker, key) => (
-            <DroppableMarker key={key} marker={marker} accept="feat" />
+      <MapContainer
+        center={latlng}
+        zoom={zoom || 13}
+        ref={mainMapRef}
+        className="h-full w-full"
+        zoomControl={false}
+        scrollWheelZoom={false}
+        dragging={false}
+      >
+        <LayersControl position="bottomleft">
+          {tiles?.map((tile, i) => (
+            <LayersControl.BaseLayer key={i} name={tile.name} checked={i === 0}>
+              <TileLayer url={tile.url} attribution={tile.attribution} />
+            </LayersControl.BaseLayer>
           ))}
+        </LayersControl>
 
-          <ZoomControl position="topleft" />
+        {markers?.map((marker, i) => (
+          <DroppableMarker key={i} data={marker} />
+        ))}
 
-          <button className="btn-location-center" onClick={handleToCenter}>
-            <FaLocationCrosshairs className="h-7 w-7 text-gray-500" />
-          </button>
+        <BuildBoundary />
 
-          <Marker
-            position={latlng}
-            ref={markerRef}
-            draggable={true} // Aktifkan draggable
-            eventHandlers={{ dragend: handleDragEnd }} // Event bila drag selesai
-          >
-            <Popup autoClose={false} closeOnClick={false}>
-              <p className="font-bold text-lg text-center !mb-1 uppercase">
-                {name}
-              </p>
-              <p className="text-center !mt-1">{latlng.join(", ")}</p>
-            </Popup>
-          </Marker>
-        </MapContainer>
-      </>
+        <button
+          onClick={() => {
+            handleToCenter();
+            if (data && latlng) {
+              onBoundaryDragEnd(latlng[0], latlng[1]);
+            }
+          }}
+          className="absolute bottom-16 left-3 z-[999] rounded-lg bg-white p-2 shadow-lg"
+        >
+          <FaLocationCrosshairs className="h-7 w-7 text-gray-500" />
+        </button>
+
+        {data && latlng && (
+          <BoundaryMarker
+            boundary={data}
+            onDragEnd={onBoundaryDragEnd}
+          />
+        )}
+        <ZoomControl position="topleft" onzoomend={(e) => {
+          const zoom = e.target._zoom;
+          handleToCenter();
+          if (data && latlng) {
+            onBoundaryDragEnd(latlng[0], latlng[1]);
+          }
+          console.log('Zoom changed:', zoom);
+        }} />
+      </MapContainer>
     </div>
   );
 };
-MapEditor.propTypes = {
-  data: PropTypes.shape({
-    id: PropTypes.number,
-    latlng: PropTypes.arrayOf(PropTypes.number),
-    name: PropTypes.string,
-  }),
-};
 
-export default React.memo(MapEditor);
+export default MapEditor;

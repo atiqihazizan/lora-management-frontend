@@ -10,7 +10,7 @@ import MapEditor from "../components/mapbuilder/MapEditor";
 
 const MapBuilder = () => {
   const { id } = useParams();
-  const { devices} = useStateContext();
+  const { devices } = useStateContext();
   const [center, setCenter] = useState();
   const [nodes, setNodes] = useState([]);
   const [mapView, setMapView] = useState([]);
@@ -31,7 +31,7 @@ const MapBuilder = () => {
       setNodes(data.nodes);
       setGeoJsonData(data.geojsonData);
       setMapView(data.boundary);
-      setCenter (data.boundary?.latlng);
+      setCenter(data.boundary?.latlng);
     }
   }, [data]);
 
@@ -54,7 +54,7 @@ const MapBuilder = () => {
             </button>
           </div>
         ) :
-        center && <MapEditor data={mapView} />
+          mapView?.latlng && <MapEditor data={mapView} />
         }
       </MapProvider>
     </div>
