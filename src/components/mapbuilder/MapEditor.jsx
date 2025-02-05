@@ -12,7 +12,7 @@ const MapEditor = ({ data }) => {
   const { zoom, id, latlng, name } = data || {};
   const { tiles } = useStateContext();
   const { markers } = useMapContext();
-  const { handleDragEnd, handleToCenter, mainMapRef } = useHandleMapEditor(id, latlng);
+  const { handleDragEnd, handleToCenter, mainMapRef, markerRef } = useHandleMapEditor(id, latlng);
 
   // Handle boundary marker drag end
   const onBoundaryDragEnd = useCallback((lat, lng) => {
@@ -63,12 +63,7 @@ const MapEditor = ({ data }) => {
         <BuildBoundary />
 
         <button
-          onClick={() => {
-            handleToCenter();
-            if (data && latlng) {
-              onBoundaryDragEnd(latlng[0], latlng[1]);
-            }
-          }}
+          onClick={() => handleToCenter()}
           className="absolute bottom-16 left-3 z-[999] rounded-lg bg-white p-2 shadow-lg"
         >
           <FaLocationCrosshairs className="h-7 w-7 text-gray-500" />
@@ -76,6 +71,7 @@ const MapEditor = ({ data }) => {
 
         {data && latlng && (
           <BoundaryMarker
+            markerRef={markerRef}
             boundary={data}
             onDragEnd={onBoundaryDragEnd}
           />

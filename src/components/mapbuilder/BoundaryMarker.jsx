@@ -5,18 +5,18 @@ import { useMemo, useCallback } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { renderToString } from "react-dom/server";
 
-const BoundaryMarker = ({ boundary, onDragEnd }) => {
+const BoundaryMarker = ({ boundary, onDragEnd, markerRef }) => {
   // Create custom marker icon
   const markerIcon = useMemo(() => {
     const position = boundary.latlng;
     const iconHtml = renderToString(
       <div className="flex flex-col items-center" style={{transform: 'translate(-12px, -48px)'}}>
-        <div className="text-center bg-white shadow-md p-4 rounded-lg">
-          <h3 className="font-bold text-lg mb-2 whitespace-nowrap uppercase">{boundary.name}</h3>
+        <div className="text-center bg-white shadow-md p-4 mb-2 rounded-lg">
+          <h3 className="font-bold text-lg mb-1 whitespace-nowrap uppercase">{boundary.name}</h3>
           {boundary.description && (
             <p className="text-sm text-gray-600">{boundary.description}</p>
           )}
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500">
             {position[0].toFixed(6)}, {position[1].toFixed(6)}
           </p>
         </div>
@@ -26,9 +26,9 @@ const BoundaryMarker = ({ boundary, onDragEnd }) => {
     return new L.DivIcon({
       className: 'custom-marker',
       html: iconHtml,
-      iconSize: [32, 88],
-      iconAnchor: [4, 88],
-      popupAnchor: [0, -88],
+      iconSize: [32, 94],
+      iconAnchor: [4, 94],
+      popupAnchor: [0, -94],
     });
   }, [boundary.name, boundary.description, boundary.latlng]);
 
@@ -69,7 +69,9 @@ const BoundaryMarker = ({ boundary, onDragEnd }) => {
   }
 
   return (
+    <>
     <Marker
+      ref={markerRef}
       position={position}
       icon={markerIcon}
       draggable={true}
@@ -77,6 +79,8 @@ const BoundaryMarker = ({ boundary, onDragEnd }) => {
         dragend: handleDragEnd
       }}
     />
+    {/* <Marker position={position} /> */}
+    </>
   );
 };
 

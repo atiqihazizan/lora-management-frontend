@@ -22,7 +22,8 @@ const useHandleMapEditor = (id, latlng) => {
         latlng: formattedLatLng,
         userid: userInfo.user_id,
       });
-      mainMapRef.current.setView(newLatLng, 15);
+    mainMapRef.current.setView(newLatLng, mainMapRef.current.getZoom());
+    // mainMapRef.current.setView(newLatLng, 15);
       // setIsChange(newLatLng);
     } catch (error) {
       console.error('Error updating position:', error);
@@ -62,13 +63,9 @@ const useHandleMapEditor = (id, latlng) => {
       console.error('Cannot center map:', { map: mainMapRef.current, latlng });
       return;
     }
-    mainMapRef.current.setView(latlng, mainMapRef.current.getZoom());
-    
-    // Update marker position
-    if (markerRef.current) {
-      markerRef.current.setLatLng(latlng);
-    }
-    // onSaveZoom(15);
+    // mainMapRef.current.setView(latlng, mainMapRef.current.getZoom());
+    markerRef.current.setLatLng(latlng);
+    onSavePosition(latlng);
   };
 
   // Update map when position changes
