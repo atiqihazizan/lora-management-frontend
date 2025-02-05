@@ -6,6 +6,7 @@ import { useStateContext } from "../../utils/useContexts";
 const useHandleMapEditor = (id, latlng) => {
   const { userInfo } = useStateContext();
   const mainMapRef = useRef(null);
+  const markerRef = useRef(null);
   const [isChange, setIsChange] = useState(false);
 
   // Save boundary position
@@ -62,6 +63,11 @@ const useHandleMapEditor = (id, latlng) => {
       return;
     }
     mainMapRef.current.setView(latlng, mainMapRef.current.getZoom());
+    
+    // Update marker position
+    if (markerRef.current) {
+      markerRef.current.setLatLng(latlng);
+    }
     // onSaveZoom(15);
   };
 
@@ -76,6 +82,7 @@ const useHandleMapEditor = (id, latlng) => {
     handleDragEnd,
     handleToCenter,
     mainMapRef,
+    markerRef,
   };
 };
 
