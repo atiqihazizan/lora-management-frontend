@@ -1,10 +1,10 @@
 import React, { forwardRef } from 'react';
 import PropTypes from 'prop-types';
-import { FaLocationCrosshairs } from "react-icons/fa6";
-import { FaPencilAlt } from "react-icons/fa";
-import { MdOutlineSave } from "react-icons/md";
+import { FaLocationCrosshairs, FaMapPin } from "react-icons/fa6";
+import { MdOutlineSave, MdSensors } from "react-icons/md";
 import { useMapContext } from '../../utils/useContexts';
 import { useDrag } from 'react-dnd';
+import { BsPinMap } from 'react-icons/bs';
 
 // Base CustomButton component
 const CustomButton = forwardRef(({ 
@@ -14,6 +14,7 @@ const CustomButton = forwardRef(({
   icon: Icon,
   style,
   isActive = false,
+  label = null,
   ...args
 }, ref) => {
   return (
@@ -26,6 +27,7 @@ const CustomButton = forwardRef(({
       {...args}
     >
       {typeof Icon === 'function' ? <Icon className="w-6 h-6 text-gray-600" /> : Icon}
+      {label}
     </button>
   );
 });
@@ -41,7 +43,8 @@ CustomButton.propTypes = {
     PropTypes.element
   ]).isRequired,
   style: PropTypes.object,
-  isActive: PropTypes.bool
+  isActive: PropTypes.bool,
+  label: PropTypes.node
 };
 
 // CenterButton component
@@ -62,14 +65,15 @@ CenterButton.propTypes = {
 };
 
 // ToggleButton component
-export const ToggleButton = ({ onClick, className = "", isActive = false }) => {
+export const ToggleButton = ({ onClick, className = "", isActive = false, label = null }) => {
   return (
     <CustomButton
       onClick={onClick}
       className={className}
       title="Toggle Drawing Tools"
-      icon={FaPencilAlt}
+      icon={isActive ? MdSensors : BsPinMap}
       isActive={isActive}
+      label={label}
     />
   );
 };
@@ -77,7 +81,8 @@ export const ToggleButton = ({ onClick, className = "", isActive = false }) => {
 ToggleButton.propTypes = {
   onClick: PropTypes.func.isRequired,
   className: PropTypes.string,
-  isActive: PropTypes.bool
+  isActive: PropTypes.bool,
+  label: PropTypes.node
 };
 
 // SaveButton component
@@ -98,7 +103,7 @@ SaveButton.propTypes = {
 };
 
 // DeviceButton component
-export const DeviceButton = ({ name, data, onClick, className = "", icon, style }) => {
+export const DeviceButton = ({ name, data, onClick, className = "", icon, style, label = null }) => {
   const { setIsDragging } = useMapContext();
   const [{ isDragging }, dragRef] = useDrag(() => ({
     type: "point",
@@ -109,15 +114,22 @@ export const DeviceButton = ({ name, data, onClick, className = "", icon, style 
   }), [data]);
 
   return (
-    <CustomButton
-      ref={dragRef}
-      onClick={onClick}
-      className={`${className} !p-[0.35rem] !rounded-[4px] !text-lg ${isDragging ? "opacity-50" : "opacity-100"}`}
-      title={name}
-      icon={icon}
-      style={style}
-      onDrag={() => setIsDragging(true)}
-    />
+    <div className="absolute group" style={style}>
+      <CustomButton
+        ref={dragRef}
+        onClick={onClick}
+        className={`${className} !p-[0.2rem] !rounded-[4px] !text-lg flex items-center gap-2 ${isDragging ? "opacity-50" : "opacity-100"}`}
+        icon={icon}
+        onDrag={() => setIsDragging(true)}
+        label={
+          label && (
+            <span className="overflow-hidden max-w-0 whitespace-nowrap transition-all duration-300 ease-in-out text-sm group-hover:max-w-[200px]">
+              {label}
+            </span>
+          )
+        }
+      />
+    </div>
   );
 };
 
@@ -130,5 +142,6 @@ DeviceButton.propTypes = {
     PropTypes.elementType,
     PropTypes.element
   ]).isRequired,
-  style: PropTypes.object
+  style: PropTypes.object,
+  label: PropTypes.node
 };
