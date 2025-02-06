@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import Dialog from "../Dialog";
 import InputField from "../forms/InputField";
-import { useState } from "react";
 
 const FormDialog = ({
   open,
@@ -17,19 +16,6 @@ const FormDialog = ({
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleFileChange = (event) => {
-    if (event.target.files.length > 0) {
-      setFormData((prev) => ({ ...prev, path: event.target.files[0] })); // Simpan fail dalam formData
-    }
-  };
-  
-  const handleClearFile = () => {
-    setFormData((prev) => {
-      const newFormData = { ...prev };
-      delete newFormData.path; // Hapuskan 'path' dari objek
-      return newFormData;
-    });
-  };
   return (
     <Dialog
       isOpen={open}
@@ -64,16 +50,6 @@ const FormDialog = ({
           error={errors.zoom} // Menampilkan pesan error
           required
         />
-        <InputField
-          id="geojsonFile"
-          label="Upload GeoJSON File"
-          type="file"
-          onChange={handleFileChange}
-          value={formData.path} // Papar nama fail jika ada
-          accept=".json"
-          onClear={handleClearFile}
-          error={errors.path}
-        />
       </div>
     </Dialog>
   );
@@ -88,14 +64,12 @@ FormDialog.propTypes = {
     name: PropTypes.string,
     latlng: PropTypes.string,
     zoom: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    path: PropTypes.oneOfType([PropTypes.object, PropTypes.string]), // Pastikan path boleh simpan fail atau string
   }).isRequired,
   setFormData: PropTypes.func.isRequired,
   errors: PropTypes.shape({
     name: PropTypes.string,
     latlng: PropTypes.string,
     zoom: PropTypes.string,
-    path: PropTypes.string,
   }),
 };
 

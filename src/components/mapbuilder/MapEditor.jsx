@@ -48,6 +48,7 @@ const MapEditor = ({ data }) => {
         zoomControl={false}
         scrollWheelZoom={false}
         dragging={false}
+        doubleClickZoom={false}
       >
         <LayersControl position="bottomleft">
           {tiles?.map((tile, i) => (

@@ -54,13 +54,14 @@ function MapToolbar({ devices, siteName }) {
         <Menu.Items className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-50">
           <Menu.Item>
             {({ active }) => (
-              <button
+              <Link
+                to="/settings"
                 className={`${
                   active ? "bg-gray-200" : ""
                 } flex items-center gap-2 w-full px-4 py-2 text-left`}
-                onClick={() => alert("Buka halaman setting")}>
-                <FaCog /> Setting
-              </button>
+                >
+                <FaCog /> Setting 
+              </Link>
             )}
           </Menu.Item>
           <Menu.Item>

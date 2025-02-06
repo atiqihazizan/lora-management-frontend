@@ -42,7 +42,7 @@ const MapProvider = ({
         // Ensure prop values are strings
         prop: newProp.map(p => ({
           ...p,
-          val: String(p.val || '')
+          val: (p.val ?? '').toString() // Convert val to string, handle null/undefined
         })),
         // Ensure latlng is in string format for dialog
         latlng: Array.isArray(markerData?.latlng) 

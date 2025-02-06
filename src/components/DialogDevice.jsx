@@ -3,17 +3,15 @@ import {
   FaPlus, 
   FaTrash,
   FaTimes,
-  FaPlusCircle,
   FaMinusCircle
 } from "react-icons/fa";
 import { ICONS } from "../utils/icons";
 import PropTypes from "prop-types";
 import Dialog from "./Dialog";
 import InputField from "./forms/InputField";
-import Button from "./elements/Button";
 import SelectField from "./forms/SelectField";
 import { units } from "../utils/constants";
-import { formatLatLong, formatLatLonToArray } from "../utils/components";
+import { formatLatLong } from "../utils/components";
 
 // Format units untuk SelectField
 const formattedUnits = units.map(unit => ({
@@ -61,6 +59,7 @@ const DialogDevice = ({
           latlng: formatLatLong(initialData.latlng || ""),
           prop: Array.isArray(initialData.prop) ? initialData.prop.map(p => ({
             ...p,
+            val: p.val?.toString() || "", // Convert val to string
             unit: p.unit || formattedUnits[0]?.value || "" // Default unit
           })) : []
         };
@@ -180,7 +179,7 @@ const DialogDevice = ({
       label: "Delete",
       onClick: handleDelete,
       variant: "danger",
-      className: "hover:bg-red-600",
+      className: "hover:bg-red-600 w-[200px]",
     },
     {
       label: "Cancel",
@@ -210,39 +209,48 @@ const DialogDevice = ({
         </div>
       )}
 
-      <div className="flex flex-row space-x-6">
-        <div className="space-y-4 w-[400px]">
-          <InputField
-            id="marker-latlng"
-            type="hidden"
-            value={deviceData.latlng || ""}
-          />
-
-          {fieldName.map((field, index) => (
+      <div className="flex flex-col gap-4">
+        {/* Basic Info Section */}
+        <div className="grid grid-cols-2 gap-4">
+          {fieldName.includes("name") && (
             <InputField
-              key={index}
-              id={`marker-${field}`}
-              label={field.charAt(0).toUpperCase() + field.slice(1)}
-              value={deviceData?.[field] || ""}
-              onChange={handleChange(field)}
-              required={field === "name"}
-              error={field === "name" && !deviceData?.[field]?.trim() ? `${field} is required` : ""}
+              label="Name"
+              value={deviceData.name}
+              onChange={handleChange("name")}
+              required
             />
-          ))}
+          )}
 
-          <SelectField
-            id="device-icon"
-            label="Icon"
-            value={deviceData.icon || Object.keys(ICONS)[0] || ""}
-            onChange={handleChange("icon")}
-            options={icons.map(icon => ({ value: icon, label: icon }))}
-          />
+          {fieldName.includes("topic") && (
+            <InputField
+              label="Topic"
+              value={deviceData.topic}
+              onChange={handleChange("topic")}
+              required
+            />
+          )}
+
+          {!fieldName.includes("topic") && (
+            <SelectField
+              id="device-icon"
+              label="Icon"
+              value={deviceData.icon}
+              onChange={handleChange("icon")}
+              options={icons.map((icon) => ({
+                value: icon,
+                label: icon,
+              }))}
+              required
+            />
+          )}
         </div>
 
-        <div className="flex-1">
-          <div className="flex justify-between items-center mb-4">
+        {/* Features Section */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium">Features</h3>
             <button
+              type="button"
               onClick={handleAddFeature}
               className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100"
             >
@@ -251,53 +259,69 @@ const DialogDevice = ({
           </div>
 
           <div className="space-y-4">
-            {deviceData.prop?.map((feature, index) => (
-              <div key={index} className="flex gap-4 items-start bg-gray-50 p-4 rounded-lg relative">
-                <div className="flex-1">
+            {deviceData.prop.map((feature, index) => (
+              <div
+                key={index}
+                className="flex flex-wrap items-end gap-2 p-4 bg-gray-50 rounded-lg relative group"
+              >
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFeature(index)}
+                  className="absolute top-2 right-2 text-red-500 hover:text-red-600"
+                >
+                  <FaMinusCircle />
+                </button>
+
+                <div className="flex-1 min-w-[200px]">
                   <InputField
                     label="Label"
                     value={feature.label}
-                    onChange={(e) => handleChangeFeature(index, "label", e.target.value)}
+                    onChange={(e) =>
+                      handleChangeFeature(index, "label", e.target.value)
+                    }
                     required
                   />
                 </div>
-                <div className="flex-1">
+
+                <div className="flex-1 min-w-[200px]">
                   <InputField
                     label="Key"
                     value={feature.key}
-                    onChange={(e) => handleChangeFeature(index, "key", e.target.value)}
+                    onChange={(e) =>
+                      handleChangeFeature(index, "key", e.target.value)
+                    }
                     required
                   />
                 </div>
-                <div className="flex-1">
+
+                <div className="flex-1 min-w-[200px]">
                   <InputField
                     label="Value"
                     value={feature.val}
-                    onChange={(e) => handleChangeFeature(index, "val", e.target.value)}
+                    onChange={(e) =>
+                      handleChangeFeature(index, "val", e.target.value)
+                    }
                     required
                   />
                 </div>
-                <div className="flex-1">
+
+                <div className="flex-1 min-w-[200px]">
                   <SelectField
                     id={`feature-${index}-unit`}
                     label="Unit"
-                    value={feature.unit || formattedUnits[0]?.value || ""}
-                    onChange={(e) => handleChangeFeature(index, "unit", e.target.value)}
+                    value={feature.unit}
+                    onChange={(e) =>
+                      handleChangeFeature(index, "unit", e.target.value)
+                    }
                     options={formattedUnits}
                     required
                   />
                 </div>
-                <button
-                  onClick={() => handleRemoveFeature(index)}
-                  className="mt-7 p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full"
-                  title="Remove feature"
-                >
-                  <FaTrash />
-                </button>
               </div>
             ))}
-            {deviceData.prop?.length === 0 && (
-              <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+
+            {deviceData.prop.length === 0 && (
+              <div className="text-center text-gray-500 py-4">
                 No features added yet. Click "Add Feature" to start adding features.
               </div>
             )}

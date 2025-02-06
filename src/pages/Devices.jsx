@@ -24,10 +24,24 @@ const Devices = () => {
   };
 
   const openDialog = (data = null) => {
-    const getData = { ...data, prop: JSON.parse(data?.prop || '[]') }
-    setDialogData(getData || { name: "", type: "", status: "", prop: [] });
-    setIsEditMode(!!data);
-    setDialogOpen(true);
+    try {
+      const parsedProp = data?.prop ? JSON.parse(data.prop || '[]') : [];
+      const getData = { 
+        ...data, 
+        prop: parsedProp.map(p => ({
+          ...p,
+          val: (p.val ?? '').toString() // Convert val to string, handle null/undefined
+        }))
+      };
+      setDialogData(getData || { name: "", type: "", status: "", prop: [] });
+      setIsEditMode(!!data);
+      setDialogOpen(true);
+    } catch (error) {
+      console.error("Error preparing device data:", error);
+      setDialogData({ name: "", type: "", status: "", prop: [] });
+      setIsEditMode(false);
+      setDialogOpen(true);
+    }
   };
 
   const closeDialog = () => {
