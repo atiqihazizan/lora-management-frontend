@@ -21,7 +21,6 @@ const MapProvider = ({
   const [onClosing, setOnClosing] = useState(null);
   const [tileLayer, setTileLayer] = useState(null);
   const [currentTileIndex, setCurrentTileIndex] = useState(0);
-  const [boundaryFlag, setBoundaryFlag] = useState(false);
   const [geoJsonData, setGeoJsonData] = useState({
     type: "FeatureCollection",
     features: [],
@@ -68,10 +67,9 @@ const MapProvider = ({
 
         // Format data for API
         const apiData = {
-          ...data,
-          // Convert latlng to array for API
+          name: data.name,
+          topic: data.topic,
           latlng: latlngToString(data.latlng),
-          // Stringify prop for API if it's not already a string
           prop: typeof data.prop === 'string' ? data.prop : JSON.stringify(data.prop)
         };
 
@@ -163,8 +161,6 @@ const MapProvider = ({
         setTileLayer,
         currentTileIndex,
         setCurrentTileIndex,
-        boundaryFlag,
-        setBoundaryFlag,
       }}
     >
       <MapLayContext.Provider

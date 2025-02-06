@@ -1,23 +1,23 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMap } from "react-leaflet";
-import { MdOutlineSave } from "react-icons/md";
-import { renderToString } from "react-dom/server";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useMapContext } from "../../utils/useContexts";
+import { useMapContext, useStateContext } from "../../utils/useContexts";
 import L from "leaflet";
 import PropTypes from 'prop-types';
 import "leaflet/dist/leaflet.css";
 import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
 import "@geoman-io/leaflet-geoman-free";
 import apiClient from "../../utils/apiClient";
-// import geojsonValidation from "geojson-validation";
+import { ToggleButton, SaveButton, DeviceButton } from "./MapControls";
+import { ICONS } from "../../utils/icons";
 
 const BuildBoundary = ({ id }) => {
   const queryClient = useQueryClient();
   const map = useMap();
+  const { devices } = useStateContext();
   const { geoJsonData, setGeoJsonData } = useMapContext();
   const featureGroupRef = useRef(L.featureGroup());
-  const saveControlRef = useRef(null);
+  const [isControlsVisible, setIsControlsVisible] = useState(false);
 
   const saveGeoJson = useMutation({
     mutationFn: (data) => {
@@ -28,6 +28,32 @@ const BuildBoundary = ({ id }) => {
     },
   });
 
+  const toggleControls = () => {
+    setIsControlsVisible(!isControlsVisible);
+    if (!isControlsVisible) {
+      map.pm.addControls({
+        position: "topleft",
+        drawCircle: false,
+        drawCircleMarker: false,
+        drawMarker: false,
+        drawText: false,
+        drawRectangle: true,
+        drawPolygon: true,
+        drawPolyline: true,
+      });
+      
+      // Get the control container and adjust its position
+      setTimeout(() => {
+        const pmControls = document.querySelector('.leaflet-pm-toolbar');
+        if (pmControls) {
+          // pmControls.style.marginTop = '80px';
+        }
+      }, 0);
+    } else {
+      map.pm.removeControls();
+    }
+  };
+
   useEffect(() => {
     featureGroupRef.current.clearLayers();
 
@@ -35,38 +61,6 @@ const BuildBoundary = ({ id }) => {
 
     if (!map.hasLayer(featureGroupRef.current)) {
       featureGroupRef.current.addTo(map);
-    }
-
-    map.pm.addControls({
-      position: "topleft",
-      drawCircle: false,
-      drawCircleMarker: false,
-      drawMarker: false,
-      drawText: false,
-      drawRectangle: true,
-      drawPolygon: true,
-      drawPolyline: true,
-    });
-
-    const saveControl = L.Control.extend({
-      onAdd: function () {
-        const button = L.DomUtil.create("button", "leaflet-bar");
-        button.innerHTML = renderToString(<MdOutlineSave className="w-5 h-5" />);
-        button.style.cursor = "pointer";
-        button.classList = "bg-white p-[.35rem] border border-gray-500 rounded shadow-md";
-
-        button.onclick = () => {
-          console.log(geoJsonData);
-          // saveGeoJson.mutateAsync({ bounding: JSON.stringify(geoJsonData) });
-        };
-
-        return button;
-      },
-    });
-
-    if (!saveControlRef.current) {
-      saveControlRef.current = new saveControl({ position: "topleft" });
-      map.addControl(saveControlRef.current);
     }
 
     map.on("pm:create", (e) => {
@@ -104,22 +98,44 @@ const BuildBoundary = ({ id }) => {
 
     return () => {
       map.pm.removeControls();
-      map.off("pm:create");
-      map.off("pm:edit");
-      map.off("pm:remove");
-
-      if (saveControlRef.current) {
-        map.removeControl(saveControlRef.current);
-        saveControlRef.current = null;
-      }
     };
-  }, [geoJsonData, map]);
+  }, [map, geoJsonData, setGeoJsonData]);
 
-  return null;
+  return (
+    <>
+      {
+        !isControlsVisible && devices?.map((device, idx) => {
+          const top = 5 + (2.5 * idx);
+          return (
+            <DeviceButton
+              key={idx}
+              name={device.name}
+              className="left-[10px]"
+              style={{ top: `${top}rem` }}
+              icon={ICONS[device.icon]}
+              data={device}
+              // onClick={() => {}}
+            />
+          );
+        })
+      }
+      {isControlsVisible && (
+        <SaveButton
+          onClick={() => saveGeoJson.mutateAsync({ bounding: JSON.stringify(geoJsonData) })}
+          className="top-[22rem] left-[10px]"
+        />
+      )}
+      <ToggleButton 
+        onClick={toggleControls}
+        className="bottom-[7.5rem] left-[10px]"
+        isActive={isControlsVisible}
+      />
+    </>
+  );
 };
 
 BuildBoundary.propTypes = {
   id: PropTypes.number
-}
+};
 
 export default BuildBoundary;

@@ -12,8 +12,6 @@ export const MapContext = createContext({
   tileLayer: null,
   setTileLayer: () => { },
   setCurrentTileIndex: () => { },
-  boundaryFlag: null,
-  setBoundaryFlag: () => { },
 });
 export const StateContext = createContext({
   login: () => console.warn("Authentication not implemented"),

@@ -24,7 +24,7 @@ const useHandleMapEditor = (id, latlng) => {
           latlng: formattedLatLng,
           userid: userInfo.user_id,
         });
-        console.log('Position updated:', newLatLng);
+        console.log('Position updated:', formattedLatLng);
       } catch (error) {
         console.error('Error updating position:', error);
       }
@@ -59,8 +59,9 @@ const useHandleMapEditor = (id, latlng) => {
       console.error('Invalid coordinates for drag end:', { lat, lng });
       return;
     }
-    mainMapRef.current.setView([lat, lng], mainMapRef.current.getZoom());
-    setMapCenter([lat, lng]);
+    debouncedSavePosition([lat, lng]);
+    // mainMapRef.current.setView([lat, lng], mainMapRef.current.getZoom());
+    // setMapCenter([lat, lng]);
   };
 
   // Handle centering the map
@@ -69,9 +70,10 @@ const useHandleMapEditor = (id, latlng) => {
       console.error('Cannot center map:', { map: mainMapRef.current, latlng });
       return;
     }
-    mainMapRef.current.setView(latlng, mainMapRef.current.getZoom());
     markerRef.current.setLatLng(latlng);
-    setMapCenter(latlng);
+    debouncedSavePosition(latlng);
+    mainMapRef.current.setView(latlng, mainMapRef.current.getZoom());
+    // setMapCenter(latlng);
   };
 
   useEffect(() => {
@@ -79,22 +81,23 @@ const useHandleMapEditor = (id, latlng) => {
     const map = mainMapRef.current;
     const marker = markerRef.current;
 
-    const onMoveEnd = () => {
-      const center = map.getCenter();
-      const newPosition = [center.lat, center.lng];
-      debouncedSavePosition(newPosition);
-    };
+    // const onMoveEnd = () => {
+    //   const center = map.getCenter();
+    //   const newPosition = [center.lat, center.lng];
+    //   markerRef.current.setLatLng(newPosition);
+    //   debouncedSavePosition(newPosition);
+    // };
 
     const onZoomEnd = () => {
       const newZoom = map.getZoom();
       debouncedSaveZoom(newZoom);
     };
 
-    map.on("moveend", onMoveEnd);
+    // map.on("moveend", onMoveEnd);
     map.on("zoomend", onZoomEnd);
 
     return () => {
-      map.off("moveend", onMoveEnd);
+      // map.off("moveend", onMoveEnd);
       map.off("zoomend", onZoomEnd);
     };
   }, [mapCenter]); // reactive kepada perubahan mapCenter

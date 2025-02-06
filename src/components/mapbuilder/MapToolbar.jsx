@@ -1,27 +1,10 @@
 import PropTypes from "prop-types";
-import DragTools from "./DragTools.jsx";
 import { Menu } from "@headlessui/react";
-import { useMemo } from "react";
 import { ICONS } from "../../utils/icons";
 import { Link } from "react-router";
-import { useMapContext } from "../../utils/useContexts.js";
 import { FaCog, FaEllipsisV, FaTrash } from "react-icons/fa";
 
-function MapToolbar({ devices, siteName }) {
-  const { boundaryFlag } = useMapContext();
-  const tools = useMemo(
-    () => [
-      {
-        title: "Features",
-        content: devices?.map((device, idx) => (
-          <DragTools key={idx} data={device} type="point">
-            {ICONS[device.icon]} {device.name}
-          </DragTools>
-        )),
-      },
-    ],
-    [devices]
-  );
+function MapToolbar({ siteName }) {
 
   return (
     <aside className="menu-sensor-container grid grid-cols-4 bg-gray-800">
@@ -34,12 +17,6 @@ function MapToolbar({ devices, siteName }) {
             {ICONS["home"]} Home
           </Link>
         </div>
-        {!boundaryFlag &&
-          tools.map(({ content }, idx) => (
-            <div className="card" key={idx}>
-              <div className="flex gap-2 text-lg">{content}</div>
-            </div>
-          ))}
       </div>
 
       <div className="col-span-2 text-center">
@@ -83,7 +60,6 @@ function MapToolbar({ devices, siteName }) {
 }
 
 MapToolbar.propTypes = {
-  devices: PropTypes.arrayOf(PropTypes.object),
   // tiles: PropTypes.arrayOf(PropTypes.object),
   siteName: PropTypes.string,
 };

@@ -5,7 +5,6 @@ import { useMapContext } from "../../utils/useContexts";
 import { useMutation } from "@tanstack/react-query";
 import { formatLatLong } from "../../utils/components";
 import PropTypes from "prop-types";
-import apiClient from "../../utils/apiClient";
 
 const DroppableAdded = ({ accept, mapid }) => {
   // const geoJsonRef = useRef();
@@ -18,6 +17,7 @@ const DroppableAdded = ({ accept, mapid }) => {
   const [, dropRef] = useDrop({
     accept: accept,
     drop: async (item, monitor) => {
+      console.log(item, monitor)
       if (!map) return console.error("Map not initialized!");
       const { x, y } = monitor.getClientOffset();
       const { left, top } = map.getContainer().getBoundingClientRect();

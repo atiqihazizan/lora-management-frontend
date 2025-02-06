@@ -11,7 +11,7 @@ import BuildBoundary from "./BuildBoundary.jsx";
 import useHandleMapEditor from "./useHandleMapEditor";
 import BoundaryMarker from "./BoundaryMarker.jsx";
 import DroppableAdded from "./DroppableAdded.jsx";
-import CenterButton from "./CenterButton.jsx";
+import { CenterButton } from "./MapControls";
 
 const MapEditor = ({ data }) => {
   const { zoom, id, latlng, name } = data || {};
@@ -56,8 +56,7 @@ const MapEditor = ({ data }) => {
         ref={mainMapRef}
         className="h-full w-full"
         zoomControl={false}
-        // scrollWheelZoom={false}
-        dragging={false}
+        // dragging={false}
         doubleClickZoom={false}
       >
         <LayersControl position="bottomleft">
@@ -77,14 +76,14 @@ const MapEditor = ({ data }) => {
         ))}
 
         <DroppableAdded accept="point" mapid={id} />
-        <BuildBoundary />
+        <BuildBoundary id={id} />
 
         <ZoomControl position="topleft" />
 
         {/* Center Button */}
         <CenterButton 
           onClick={handleToCenter}
-          className="bottom-16 left-3"
+          className="bottom-16 left-[10px]"
         />
 
         {/* Boundary Marker */}

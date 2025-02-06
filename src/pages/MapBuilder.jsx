@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { useStateContext } from "../utils/useContexts";
 import MapProvider from "../context/MapContext"; // Import DragProvider
 import apiClient from "../utils/apiClient";
 import MapToolbar from "../components/mapbuilder/MapToolbar";
@@ -10,8 +9,6 @@ import MapEditor from "../components/mapbuilder/MapEditor";
 
 const MapBuilder = () => {
   const { id } = useParams();
-  const { devices } = useStateContext();
-  const [center, setCenter] = useState();
   const [nodes, setNodes] = useState([]);
   const [mapView, setMapView] = useState([]);
   const [geoJsonData, setGeoJsonData] = useState({ type: "FeatureCollection", features: [] });
@@ -31,7 +28,6 @@ const MapBuilder = () => {
       setNodes(data.nodes);
       setGeoJsonData(data.geojsonData);
       setMapView(data.boundary);
-      setCenter(data.boundary?.latlng);
     }
   }, [data]);
 
@@ -43,7 +39,7 @@ const MapBuilder = () => {
   return (
     <div className="h-full flex flex-col bg-gray-600">
       <MapProvider defaultMarkers={nodes || []} defaultGeoJson={geoJsonData} >
-        <MapToolbar devices={devices} siteName={mapView?.name} />
+        <MapToolbar siteName={mapView?.name} />
         {isLoading ? (
           <div className="spinner m-auto"></div>
         ) : isError ? (
