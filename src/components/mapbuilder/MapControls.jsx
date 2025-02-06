@@ -20,7 +20,7 @@ const CustomButton = forwardRef(({
     <button
       ref={ref}
       onClick={onClick}
-      className={`absolute z-[400] bg-white rounded-md shadow-lg p-[0.60rem] border border-2 border-gray-400 hover:bg-gray-100 ${className}`}
+      className={`absolute z-[400] bg-white rounded-md shadow-lg p-[0.60rem] border-2 border-gray-400 hover:bg-gray-100 ${className}`}
       title={title}
       style={style}
       {...args}
