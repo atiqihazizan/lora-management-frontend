@@ -105,7 +105,7 @@ const BuildBoundary = ({ id }) => {
     <>
       {
         !isControlsVisible && devices?.map((device, idx) => {
-          const top = 5 + (2.5 * idx);
+          const top = 5.5 + (2.5 * idx);
           return (
             <DeviceButton
               key={idx}
@@ -114,6 +114,7 @@ const BuildBoundary = ({ id }) => {
               style={{ top: `${top}rem` }}
               icon={ICONS[device.icon]}
               data={device}
+              label={device.name}
               // onClick={() => {}}
             />
           );

@@ -21,7 +21,7 @@ const CustomButton = forwardRef(({
     <button
       ref={ref}
       onClick={onClick}
-      className={`absolute z-[400] bg-white rounded-md shadow-lg p-[0.60rem] border-2 border-gray-400 hover:bg-gray-100 ${className}`}
+      className={`absolute z-[400] bg-white rounded-md shadow-lg border-2 border-gray-400 hover:bg-gray-100 ${className}`}
       title={title}
       style={style}
       {...args}
@@ -52,7 +52,7 @@ export const CenterButton = ({ onClick, className = "" }) => {
   return (
     <CustomButton
       onClick={onClick}
-      className={`${className} bottom-16 left-[10px]`}
+      className={`${className} bottom-16 left-[10px] p-[0.60rem]`}
       title="Center Map"
       icon={FaLocationCrosshairs}
     />
@@ -69,7 +69,7 @@ export const ToggleButton = ({ onClick, className = "", isActive = false, label 
   return (
     <CustomButton
       onClick={onClick}
-      className={className}
+      className={`p-[0.60rem] ${className}`}
       title="Toggle Drawing Tools"
       icon={isActive ? MdSensors : BsPinMap}
       isActive={isActive}
@@ -118,12 +118,12 @@ export const DeviceButton = ({ name, data, onClick, className = "", icon, style,
       <CustomButton
         ref={dragRef}
         onClick={onClick}
-        className={`${className} !p-[0.2rem] !rounded-[4px] !text-lg flex items-center gap-2 ${isDragging ? "opacity-50" : "opacity-100"}`}
+        className={`${className} p-[0.30rem] !rounded-[4px] !text-lg flex items-center  ${isDragging ? "opacity-50" : "opacity-100"}`}
         icon={icon}
         onDrag={() => setIsDragging(true)}
         label={
           label && (
-            <span className="overflow-hidden max-w-0 whitespace-nowrap transition-all duration-300 ease-in-out text-sm group-hover:max-w-[200px]">
+            <span className="overflow-hidden max-w-0 whitespace-nowrap transition-all duration-300 ease-in-out text-sm group-hover:max-w-[200px] group-hover:mx-2">
               {label}
             </span>
           )

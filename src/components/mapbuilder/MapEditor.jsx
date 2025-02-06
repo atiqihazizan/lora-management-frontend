@@ -56,7 +56,7 @@ const MapEditor = ({ data }) => {
         ref={mainMapRef}
         className="h-full w-full"
         zoomControl={false}
-        // dragging={false}
+        dragging={false}
         doubleClickZoom={false}
       >
         <LayersControl position="bottomleft">
