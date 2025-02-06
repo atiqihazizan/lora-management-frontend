@@ -18,7 +18,7 @@ const useHandleMapEditor = (id, latlng) => {
 
     try {
       const formattedLatLng = formatLatLong(newLatLng);
-      const res = await apiClient.put(`/boundaries/fetures/${id}`, {
+      const res = await apiClient.put(`/geofance/fetures/${id}`, {
         latlng: formattedLatLng,
         userid: userInfo.user_id,
       });
@@ -38,7 +38,7 @@ const useHandleMapEditor = (id, latlng) => {
     }
 
     try {
-      await apiClient.put(`/boundaries/fetures/${id}`, {
+      await apiClient.put(`/geofance/fetures/${id}`, {
         zoom,
         userid: userInfo.user_id,
       });

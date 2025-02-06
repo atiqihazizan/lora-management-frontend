@@ -1,9 +1,11 @@
 import { useDrop } from "react-dnd";
 import { v4 as uuidv4 } from "uuid";
 import { useMapEvents } from "react-leaflet";
-import { formatLatLong } from "../../../xtrash/constants";
 import { useMapContext } from "../../utils/useContexts";
+import { useMutation } from "@tanstack/react-query";
+import { formatLatLong } from "../../utils/components";
 import PropTypes from "prop-types";
+import apiClient from "../../utils/apiClient";
 
 const DroppableAdded = ({ accept, mapid }) => {
   // const geoJsonRef = useRef();
@@ -37,7 +39,6 @@ const DroppableAdded = ({ accept, mapid }) => {
   return (
     <>
       {isDragging && (<div ref={dropRef} className="marker-droppable-area absolute inset-0"></div>)}
-      {/* {isObjectNotEmpty(geoJsonData) && (<GeoJSON data={geoJsonData} ref={geoJsonRef} />)} */}
     </>
   );
 };

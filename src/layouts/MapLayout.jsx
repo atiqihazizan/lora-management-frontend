@@ -17,7 +17,7 @@ const MapLayout = () => {
         const [nodes, mapViews, _boundaries] = await Promise.all([
           apiClient.get("/nodes"),
           apiClient.get("/mapview"),
-          apiClient.get("/boundaries")
+          apiClient.get("/geofance")
         ]);
         setMarkers(nodes);
         setListMapView(mapViews);

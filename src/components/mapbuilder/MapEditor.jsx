@@ -7,6 +7,7 @@ import DroppableMarker from "./MarkerDraggable.jsx";
 import BuildBoundary from "./BuildBoundary.jsx";
 import useHandleMapEditor from "./useHandleMapEditor";
 import BoundaryMarker from "./BoundaryMarker.jsx";
+import DroppableAdded from "./DroppableAdded.jsx";
 
 const MapEditor = ({ data }) => {
   const { zoom, id, latlng, name } = data || {};
@@ -56,10 +57,9 @@ const MapEditor = ({ data }) => {
           ))}
         </LayersControl>
 
-        {markers?.map((marker, i) => (
-          <DroppableMarker key={i} marker={marker} accept="marker" />
-        ))}
+        {markers?.map((marker, i) => (<DroppableMarker key={i} marker={marker} accept="marker" />))}
 
+        <DroppableAdded accept="point" mapid={id} />
         <BuildBoundary />
 
         <button

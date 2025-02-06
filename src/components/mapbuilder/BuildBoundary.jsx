@@ -19,14 +19,14 @@ const BuildBoundary = ({ id }) => {
   const featureGroupRef = useRef(L.featureGroup());
   const saveControlRef = useRef(null);
 
-  // const saveGeoJson = useMutation({
-  //   mutationFn: (data) => {
-  //     return apiClient.put(`/mapview/${id}`, data);
-  //   },
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries(["mapview"]);
-  //   },
-  // });
+  const saveGeoJson = useMutation({
+    mutationFn: (data) => {
+      return apiClient.put(`/boundary/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["mapview"]);
+    },
+  });
 
   useEffect(() => {
     featureGroupRef.current.clearLayers();
@@ -40,7 +40,12 @@ const BuildBoundary = ({ id }) => {
     map.pm.addControls({
       position: "topleft",
       drawCircle: false,
+      drawCircleMarker: false,
       drawMarker: false,
+      drawText: false,
+      drawRectangle: true,
+      drawPolygon: true,
+      drawPolyline: true,
     });
 
     const saveControl = L.Control.extend({

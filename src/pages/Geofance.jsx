@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import apiClient from "../utils/apiClient";
 import Loading from "../components/Loading";
-import FormDialog from "../components/boundaries/FormDialog";
+import FormDialog from "../components/geofance/FormDialog";
 import { FaCog, FaPencilAlt, FaTrash } from "react-icons/fa";
 import { useStateContext } from "../utils/useContexts";
 import {
@@ -14,7 +14,7 @@ import {
   getSortedRowModel,
 } from '@tanstack/react-table';
 
-const Boundaries = () => {
+const Geofance = () => {
   const navigate = useNavigate();
   const { userInfo } = useStateContext();
   const queryClient = useQueryClient();
@@ -26,14 +26,14 @@ const Boundaries = () => {
 
   const { data: tableData, isLoading, isError, error } = useQuery({
     queryKey: ["boundaries"],
-    queryFn: () => apiClient.get("/boundaries"),
+    queryFn: () => apiClient.get("/geofance"),
   });
 
   const saveMutation = useMutation({
     mutationFn: ({ id, name, latlng, zoom }) => {
       const newdata = { id, name, latlng, zoom, userid: userInfo.user_id };
       const method = editMode ? "put" : "post";
-      const url = editMode ? `/boundaries/${id}` : "/boundaries";
+      const url = editMode ? `/geofance/${id}` : "/geofance";
       return apiClient[method](url, newdata);
     },
     onSuccess: () => {
@@ -127,7 +127,7 @@ const Boundaries = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this boundary?')) {
       try {
-        await apiClient.delete(`/boundaries/${id}`);
+        await apiClient.delete(`/geofance/${id}`);
         queryClient.invalidateQueries(["boundaries"]);
       } catch (err) {
         console.error('Failed to delete:', err);
@@ -254,4 +254,4 @@ const Boundaries = () => {
   );
 };
 
-export default Boundaries;
+export default Geofance;

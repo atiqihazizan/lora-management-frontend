@@ -18,7 +18,7 @@ const MapBuilder = () => {
 
   const { data, isLoading, error: mapviewError } = useQuery({
     queryKey: ['mapview', id],
-    queryFn: async () => await apiClient.get(`/boundaries/${id}`),
+    queryFn: async () => await apiClient.get(`/geofance/${id}`),
     enabled: !!id,
     staleTime: 0,
     // staleTime: 1000 * 60 * 5,

@@ -32,7 +32,7 @@ function MapMonitor() {
   useEffect(() => {
     const fetchBoundaries = async () => {
       try {
-        const response = await apiClient.get("/boundaries");
+        const response = await apiClient.get("/geofance");
         setBoundaries(response);
       } catch (error) {
         console.error("Error fetching boundaries:", error);

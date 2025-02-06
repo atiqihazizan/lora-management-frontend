@@ -13,7 +13,7 @@ import NotFoundPage from "./pages/NotFound";
 import Tiles from "./pages/Tiles"; // Import the Tiles page
 import Users from "./pages/Users"; // Import the Users page
 import MapMonitor from "./pages/MapMonitor";
-import Boundaries from "./pages/Boundaries";
+import Geofance from "./pages/geofance";
 
 const routers = createBrowserRouter([
   {
@@ -29,7 +29,7 @@ const routers = createBrowserRouter([
     element: <DefaultLayout />,
     children: [
       { path: "dashboard", element: <Navigate to="/" /> },
-      { path: "", element: <HeadFootLayout />, children: [{ path: "", element: <Boundaries /> }] },
+      { path: "", element: <HeadFootLayout />, children: [{ path: "", element: <Geofance /> }] },
       { path: "builder/:id", element: <MapBuilder /> },
       {
         path: "settings", element: <SettingsLayout />, children: [
