@@ -1,52 +1,57 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { formatLatLong } from "../../utils/components";
 import apiClient from "../../utils/apiClient";
 import { useStateContext } from "../../utils/useContexts";
+import debounce from "lodash.debounce";
 
 const useHandleMapEditor = (id, latlng) => {
   const { userInfo } = useStateContext();
   const mainMapRef = useRef(null);
   const markerRef = useRef(null);
-  const [isChange, setIsChange] = useState(false);
+  const [mapCenter, setMapCenter] = useState([]);
 
-  // Save boundary position
-  const onSavePosition = async (newLatLng) => {
-    if (!id || !userInfo?.user_id || !Array.isArray(newLatLng)) {
-      console.error('Invalid data for saving position:', { id, userInfo, newLatLng });
-      return;
-    }
+  // Save boundary position with debounce
+  const debouncedSavePosition = useCallback(
+    debounce((newLatLng) => {
+      if (!id || !userInfo?.user_id || !Array.isArray(newLatLng)) {
+        console.error('Invalid data for saving position:', { id, userInfo, newLatLng });
+        return;
+      }
 
-    try {
-      const formattedLatLng = formatLatLong(newLatLng);
-      const res = await apiClient.put(`/geofance/fetures/${id}`, {
-        latlng: formattedLatLng,
-        userid: userInfo.user_id,
-      });
-    mainMapRef.current.setView(newLatLng, mainMapRef.current.getZoom());
-    // mainMapRef.current.setView(newLatLng, 15);
-      // setIsChange(newLatLng);
-    } catch (error) {
-      console.error('Error updating position:', error);
-    }
-  };
+      try {
+        const formattedLatLng = formatLatLong(newLatLng);
+        apiClient.put(`/geofance/fetures/${id}`, {
+          latlng: formattedLatLng,
+          userid: userInfo.user_id,
+        });
+        console.log('Position updated:', newLatLng);
+      } catch (error) {
+        console.error('Error updating position:', error);
+      }
+    }, 500), // tunggu 500ms sebelum hantar ke backend
+    [id, userInfo]
+  );
 
-  // Save boundary zoom level
-  const onSaveZoom = async (zoom) => {
-    if (!id || !userInfo?.user_id || typeof zoom !== 'number') {
-      console.error('Invalid data for saving zoom:', { id, userInfo, zoom });
-      return;
-    }
+  // Save boundary zoom level with debounce
+  const debouncedSaveZoom = useCallback(
+    debounce((zoom) => {
+      if (!id || !userInfo?.user_id || typeof zoom !== 'number') {
+        console.error('Invalid data for saving zoom:', { id, userInfo, zoom });
+        return;
+      }
 
-    try {
-      await apiClient.put(`/geofance/fetures/${id}`, {
-        zoom,
-        userid: userInfo.user_id,
-      });
-      console.log('Zoom updated:', zoom);
-    } catch (error) {
-      console.error('Error updating zoom:', error);
-    }
-  };
+      try {
+        apiClient.put(`/geofance/fetures/${id}`, {
+          zoom,
+          userid: userInfo.user_id,
+        });
+        console.log('Zoom updated:', zoom);
+      } catch (error) {
+        console.error('Error updating zoom:', error);
+      }
+    }, 500),
+    [id, userInfo]
+  );
 
   // Handle marker drag end
   const handleDragEnd = (lat, lng) => {
@@ -54,7 +59,8 @@ const useHandleMapEditor = (id, latlng) => {
       console.error('Invalid coordinates for drag end:', { lat, lng });
       return;
     }
-    onSavePosition([lat, lng]);
+    mainMapRef.current.setView([lat, lng], mainMapRef.current.getZoom());
+    setMapCenter([lat, lng]);
   };
 
   // Handle centering the map
@@ -63,17 +69,39 @@ const useHandleMapEditor = (id, latlng) => {
       console.error('Cannot center map:', { map: mainMapRef.current, latlng });
       return;
     }
-    // mainMapRef.current.setView(latlng, mainMapRef.current.getZoom());
+    mainMapRef.current.setView(latlng, mainMapRef.current.getZoom());
     markerRef.current.setLatLng(latlng);
-    onSavePosition(latlng);
+    setMapCenter(latlng);
   };
 
-  // Update map when position changes
   useEffect(() => {
-    if (isChange && Array.isArray(isChange)) {
-      handleToCenter();
-    }
-  }, [isChange]);
+    if (!mainMapRef.current || !markerRef.current) return;
+    const map = mainMapRef.current;
+    const marker = markerRef.current;
+
+    const onMoveEnd = () => {
+      const center = map.getCenter();
+      const newPosition = [center.lat, center.lng];
+      debouncedSavePosition(newPosition);
+    };
+
+    const onZoomEnd = () => {
+      const newZoom = map.getZoom();
+      debouncedSaveZoom(newZoom);
+    };
+
+    map.on("moveend", onMoveEnd);
+    map.on("zoomend", onZoomEnd);
+
+    return () => {
+      map.off("moveend", onMoveEnd);
+      map.off("zoomend", onZoomEnd);
+    };
+  }, [mapCenter]); // reactive kepada perubahan mapCenter
+
+  useEffect(() => {
+    setMapCenter(latlng);
+  },[]);
 
   return {
     handleDragEnd,

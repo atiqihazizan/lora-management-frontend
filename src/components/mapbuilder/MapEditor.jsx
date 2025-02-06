@@ -1,19 +1,28 @@
-import { MapContainer, TileLayer, LayersControl, ZoomControl } from "react-leaflet";
-import L from "leaflet";
-import { useEffect, useCallback } from "react";
-import { FaLocationCrosshairs } from "react-icons/fa6";
+import { 
+  MapContainer, 
+  TileLayer, 
+  LayersControl, 
+  ZoomControl 
+} from "react-leaflet";
+import { useCallback } from "react";
 import { useStateContext, useMapContext } from "../../utils/useContexts";
 import DroppableMarker from "./MarkerDraggable.jsx";
 import BuildBoundary from "./BuildBoundary.jsx";
 import useHandleMapEditor from "./useHandleMapEditor";
 import BoundaryMarker from "./BoundaryMarker.jsx";
 import DroppableAdded from "./DroppableAdded.jsx";
+import CenterButton from "./CenterButton.jsx";
 
 const MapEditor = ({ data }) => {
   const { zoom, id, latlng, name } = data || {};
   const { tiles } = useStateContext();
   const { markers } = useMapContext();
-  const { handleDragEnd, handleToCenter, mainMapRef, markerRef } = useHandleMapEditor(id, latlng);
+  const { 
+    handleDragEnd, 
+    handleToCenter, 
+    mainMapRef, 
+    markerRef 
+  } = useHandleMapEditor(id, latlng);
 
   // Handle boundary marker drag end
   const onBoundaryDragEnd = useCallback((lat, lng) => {
@@ -38,6 +47,7 @@ const MapEditor = ({ data }) => {
     console.error('Missing required data:', { tiles, markers, data });
     return null;
   }
+
   return (
     <div className="relative h-full w-full">
       <MapContainer
@@ -46,30 +56,38 @@ const MapEditor = ({ data }) => {
         ref={mainMapRef}
         className="h-full w-full"
         zoomControl={false}
-        scrollWheelZoom={false}
+        // scrollWheelZoom={false}
         dragging={false}
         doubleClickZoom={false}
       >
         <LayersControl position="bottomleft">
           {tiles?.map((tile, i) => (
-            <LayersControl.BaseLayer key={i} name={tile.name} checked={i === 0}>
+            <LayersControl.BaseLayer
+              key={i}
+              checked={i === 0}
+              name={tile.name}
+            >
               <TileLayer url={tile.url} attribution={tile.attribution} />
             </LayersControl.BaseLayer>
           ))}
         </LayersControl>
 
-        {markers?.map((marker, i) => (<DroppableMarker key={i} marker={marker} accept="marker" />))}
+        {markers?.map((marker, i) => (
+          <DroppableMarker key={i} marker={marker} accept="marker" />
+        ))}
 
         <DroppableAdded accept="point" mapid={id} />
         <BuildBoundary />
 
-        <button
-          onClick={() => handleToCenter()}
-          className="absolute bottom-16 left-3 z-[999] rounded-lg bg-white p-2 shadow-lg"
-        >
-          <FaLocationCrosshairs className="h-7 w-7 text-gray-500" />
-        </button>
+        <ZoomControl position="topleft" />
 
+        {/* Center Button */}
+        <CenterButton 
+          onClick={handleToCenter}
+          className="bottom-16 left-3"
+        />
+
+        {/* Boundary Marker */}
         {data && latlng && (
           <BoundaryMarker
             markerRef={markerRef}
@@ -77,14 +95,6 @@ const MapEditor = ({ data }) => {
             onDragEnd={onBoundaryDragEnd}
           />
         )}
-        <ZoomControl position="topleft" onzoomend={(e) => {
-          const zoom = e.target._zoom;
-          handleToCenter();
-          if (data && latlng) {
-            onBoundaryDragEnd(latlng[0], latlng[1]);
-          }
-          console.log('Zoom changed:', zoom);
-        }} />
       </MapContainer>
     </div>
   );
