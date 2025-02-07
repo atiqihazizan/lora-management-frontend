@@ -4,9 +4,10 @@ import { Link } from "react-router";
 import { FaCog, FaBars, FaTrash, FaUpload, FaHome } from "react-icons/fa";
 import { Dropdown, DropdownButton, DropdownMenu, DropdownItem, DropdownFileUpload } from "../Dropdown";
 import apiClient from "../../utils/apiClient";
+import { useMapContext } from "../../utils/useContexts";
 
 function MapToolbar({ siteName, mapData }) {
-  
+  const { setGeoJsonData } = useMapContext();
   const handleFileUpload = async (file) => {
     try {
       // Check file size (10MB limit)
@@ -21,6 +22,7 @@ function MapToolbar({ siteName, mapData }) {
 
       console.log('File uploaded successfully:', data);
       // window.location.reload(); // Refresh to show new map data
+      if(data?.geojsonData)setGeoJsonData(data.geojsonData);
 
     } catch (error) {
       console.error('Error uploading file:', error.message);

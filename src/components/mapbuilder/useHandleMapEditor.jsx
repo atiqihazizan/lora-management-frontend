@@ -35,6 +35,7 @@ const useHandleMapEditor = (id, latlng) => {
   const handleDragEnd = (lat, lng) => {
     if (typeof lat !== 'number' || typeof lng !== 'number') return;
     const newLatLng = [lat, lng];
+    mainMapRef.current.setView(newLatLng, mainMapRef.current.getZoom());
     debouncedSaveMapState({ latlng: formatLatLong(newLatLng) });
   };
 

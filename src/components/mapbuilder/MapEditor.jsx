@@ -33,17 +33,7 @@ const MapEditor = ({ data }) => {
     handleDragEnd(lat, lng);
   }, [handleDragEnd]);
 
-  // Set default marker icon
-  // useEffect(() => {
-  //   delete L.Icon.Default.prototype._getIconUrl;
-  //   L.Icon.Default.mergeOptions({
-  //     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  //     iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  //     shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  //   });
-  // }, []);
-
-  if (!tiles || !markers || !data) {
+  if (!tiles || !markers || !data || !latlng) {
     console.error('Missing required data:', { tiles, markers, data });
     return null;
   }
@@ -71,28 +61,26 @@ const MapEditor = ({ data }) => {
           ))}
         </LayersControl>
 
+        <DroppableAdded accept="point" mapid={id} />
+        <BuildBoundary id={id} />
+        <ZoomControl position="topleft" />
+
         {markers?.map((marker, i) => (
           <DroppableMarker key={i} marker={marker} accept="marker" />
         ))}
 
-        <DroppableAdded accept="point" mapid={id} />
-        <BuildBoundary id={id} />
-
-        <ZoomControl position="topleft" />
-
-        {/* Center Button */}
-        <CenterButton 
-          onClick={handleToCenter}
-          className="bottom-16 left-[10px]"
-        />
-
-        {/* Boundary Marker */}
         {data && latlng && (
-          <BoundaryMarker
-            markerRef={markerRef}
-            boundary={data}
-            onDragEnd={onBoundaryDragEnd}
-          />
+          <>
+            <CenterButton
+              onClick={handleToCenter}
+              className="bottom-16 left-[10px]"
+            />
+            <BoundaryMarker
+              markerRef={markerRef}
+              boundary={data}
+              onDragEnd={onBoundaryDragEnd}
+            />
+          </>
         )}
       </MapContainer>
     </div>
