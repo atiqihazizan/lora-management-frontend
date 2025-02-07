@@ -1,66 +1,56 @@
+import React from "react";
 import PropTypes from "prop-types";
-import { Menu } from "@headlessui/react";
-import { ICONS } from "../../utils/icons";
 import { Link } from "react-router";
-import { FaCog, FaEllipsisV, FaTrash } from "react-icons/fa";
+import { FaCog, FaBars, FaTrash, FaUpload, FaHome } from "react-icons/fa";
+import { Dropdown, DropdownButton, DropdownMenu, DropdownItem } from "../Dropdown";
 
 function MapToolbar({ siteName }) {
-
   return (
-    <aside className="menu-sensor-container grid grid-cols-4 bg-gray-800">
-      <div className="flex gap-2">
-        <div className="card !pr-0">
+    <div className="  bg-gray-800 text-white">
+      <div className="flex items-center justify-between py-2 px-4">
+        <div className="flex items-center gap-4">
           <Link
             to="/dashboard"
-            key={123}
-            className="btn-flex-icon-text btn-bg-white">
-            {ICONS["home"]} Home
+            className="flex items-center gap-2 text-white hover:text-gray-400"
+          >
+            <FaHome className="w-5 h-5" />
           </Link>
+          <h1 className="text-xl font-semibold ">{siteName}</h1>
         </div>
-      </div>
 
-      <div className="col-span-2 text-center">
-        <p className="text-white text-3xl pt-1 font-bold">{siteName}</p>
+        <Dropdown>
+          <DropdownButton 
+            icon={FaBars} 
+            label=""
+            background="text-white hover:bg-gray-200/50"
+            className="!p-2"
+          />
+          <DropdownMenu>
+            <DropdownItem 
+              icon={FaUpload} 
+              label="Upload Boundary" 
+              onClick={() => alert("Upload Boundary")} 
+            />
+            <DropdownItem 
+              icon={FaCog} 
+              label="Settings" 
+              href="/settings"
+              type="link"
+            />
+            <DropdownItem 
+              icon={FaTrash} 
+              label="Delete" 
+              onClick={() => {}} 
+              disabled={true}
+            />
+          </DropdownMenu>
+        </Dropdown>
       </div>
-
-      <div className="flex justify-end pt-1">
-      <Menu as="div" className="relative">
-        <Menu.Button className="btn-flex-icon-text mt-1 text-white">
-          <FaEllipsisV size={24} />
-        </Menu.Button>
-        <Menu.Items className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-50">
-          <Menu.Item>
-            {({ active }) => (
-              <Link
-                to="/settings"
-                className={`${
-                  active ? "bg-gray-200" : ""
-                } flex items-center gap-2 w-full px-4 py-2 text-left`}
-                >
-                <FaCog /> Setting 
-              </Link>
-            )}
-          </Menu.Item>
-          <Menu.Item>
-            {({ active }) => (
-              <button
-                className={`${
-                  active ? "bg-red-500 text-white" : ""
-                } flex items-center gap-2 w-full px-4 py-2 text-left`}
-                onClick={() => alert("Padam data")}>
-                <FaTrash /> Delete
-              </button>
-            )}
-          </Menu.Item>
-        </Menu.Items>
-      </Menu>
-      </div>
-    </aside>
+    </div>
   );
 }
 
 MapToolbar.propTypes = {
-  // tiles: PropTypes.arrayOf(PropTypes.object),
   siteName: PropTypes.string,
 };
 

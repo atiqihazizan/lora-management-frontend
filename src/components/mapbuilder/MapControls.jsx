@@ -8,7 +8,7 @@ import { BsPinMap } from 'react-icons/bs';
 
 // Base CustomButton component
 const CustomButton = forwardRef(({ 
-  onClick, 
+  onClick =  () => {}, 
   className = "", 
   title,
   icon: Icon,
@@ -37,7 +37,7 @@ CustomButton.displayName = 'CustomButton';
 CustomButton.propTypes = {
   onClick: PropTypes.func,
   className: PropTypes.string,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   icon: PropTypes.oneOfType([
     PropTypes.elementType,
     PropTypes.element
@@ -45,6 +45,10 @@ CustomButton.propTypes = {
   style: PropTypes.object,
   isActive: PropTypes.bool,
   label: PropTypes.node
+};
+
+CustomButton.defaultProps = {
+  title: "",
 };
 
 // CenterButton component
@@ -123,7 +127,7 @@ export const DeviceButton = ({ name, data, onClick, className = "", icon, style,
         onDrag={() => setIsDragging(true)}
         label={
           label && (
-            <span className="overflow-hidden max-w-0 whitespace-nowrap transition-all duration-300 ease-in-out text-sm group-hover:max-w-[200px] group-hover:mx-2">
+            <span className="overflow-hidden max-w-0 whitespace-nowrap transition-all duration-300 ease-in-out text-sm group-hover:max-w-[200px] group-hover:ml-3">
               {label}
             </span>
           )

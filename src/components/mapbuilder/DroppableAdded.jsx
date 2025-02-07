@@ -7,7 +7,6 @@ import { formatLatLong } from "../../utils/components";
 import PropTypes from "prop-types";
 
 const DroppableAdded = ({ accept, mapid }) => {
-  // const geoJsonRef = useRef();
   const { isDragging, openMarkerDialog } = useMapContext()
 
   const map = useMapEvents({
@@ -17,7 +16,6 @@ const DroppableAdded = ({ accept, mapid }) => {
   const [, dropRef] = useDrop({
     accept: accept,
     drop: async (item, monitor) => {
-      console.log(item, monitor)
       if (!map) return console.error("Map not initialized!");
       const { x, y } = monitor.getClientOffset();
       const { left, top } = map.getContainer().getBoundingClientRect();
@@ -36,11 +34,7 @@ const DroppableAdded = ({ accept, mapid }) => {
     },
   });
 
-  return (
-    <>
-      {isDragging && (<div ref={dropRef} className="marker-droppable-area absolute inset-0"></div>)}
-    </>
-  );
+  return isDragging && (<div ref={dropRef} className="marker-droppable-area absolute inset-0"></div>);
 };
 
 DroppableAdded.propTypes = {
