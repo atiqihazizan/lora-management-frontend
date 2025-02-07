@@ -1,15 +1,31 @@
 import React from "react";
 import PropTypes from "prop-types";
+import apiClient from "../../utils/apiClient";
 import { Link } from "react-router";
-import { FaCog, FaBars, FaTrash, FaUpload, FaHome, FaFile, FaMap } from "react-icons/fa";
+import { FaCog, FaBars, FaTrash, FaUpload, FaHome } from "react-icons/fa";
 import { Dropdown, DropdownButton, DropdownMenu, DropdownItem, DropdownFileUpload } from "../Dropdown";
 
 function MapToolbar({ siteName }) {
   const handleFileUpload = async (file) => {
     try {
-      const response = await apiClient.post('/api/upload', file, {
+      // Check file size (10MB limit)
+      const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+      if (file.size > MAX_FILE_SIZE) {
+        throw new Error(`File size too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await apiClient.post('/upload/json', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+        },
+        // Add timeout and onUploadProgress for better UX
+        timeout: 30000,
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          console.log(`Upload Progress: ${percentCompleted}%`);
         },
       });
 
@@ -17,8 +33,13 @@ function MapToolbar({ siteName }) {
       console.log('File uploaded successfully:', data);
       // Handle success (e.g., show notification, update UI)
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error('Error uploading file:', error.message);
       // Handle error (e.g., show error message)
+      if (error.response?.status === 413) {
+        alert('File size too large. Please try a smaller file.');
+      } else {
+        alert(error.message || 'Error uploading file. Please try again.');
+      }
     }
   };
 
