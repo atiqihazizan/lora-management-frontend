@@ -1,14 +1,13 @@
 import { useMap } from "react-leaflet";
-import { isObjectNotEmpty, formatLatLonToArray } from "../../utils/components";
-import { useContext, useMemo } from "react";
-import { MapLayContext } from "../../utils/Contexts.js";
+import { formatLatLonToArray } from "../../utils/components";
+import { useMemo } from "react";
+import { useMapLayerContext } from "../../utils/useContexts.js";
 import WaveCircle from "../WaveCircle";
 import MarkerDevices from "./MarkerDevices.jsx";
 
 function MapMarkers() {
   const map = useMap(); // Get map instance
-  const context = useContext(MapLayContext) || { markers: [], boundaries: [] };
-  const { markers, boundaries } = context;
+  const { mapSelect, markers } = useMapLayerContext();
 
   const processedMarkers = useMemo(() => {
     return markers?.map((m) => {
@@ -25,7 +24,7 @@ function MapMarkers() {
     }).filter(Boolean); // Remove null markers
   }, [markers]);
 
-  return boundaries && processedMarkers?.map((m, i) => {
+  return mapSelect && processedMarkers?.filter(m => m.mapid === mapSelect?.id)?.map((m, i) => {
     return (
       <div key={i}>
         <MarkerDevices data={m} />

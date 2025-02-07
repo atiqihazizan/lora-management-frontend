@@ -126,7 +126,7 @@ const SideBarMap = ({ setIsSidebarVisible, isSidebarVisible, mapRef, onBoundaryS
             onClick={handleAdminClick}
             className="w-full px-4 py-2 text-white text-sm bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
           >
-            {userInfo ? "Admin" : "Login"}
+            {userInfo ? "Builder" : "Login"}
           </button>
         </div>
       </div>

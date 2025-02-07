@@ -18,13 +18,12 @@ const flyToOptions = {
 
 function MapMonitor() {
   const { slug } = useParams();
-  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-  const [selectedBoundary, setSelectedBoundary] = useState(null);
-  const { setMapSelect = () => {}, boundaries, setBoundaries = () => {} } = useMapLayerContext();
+  const { mapSelect, setMapSelect, boundaries, setBoundaries = () => {} } = useMapLayerContext();
   const { tiles, tilesLoading } = useStateContext();
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+  const [center] = useState(DEFAULT_CENTER);
+  const [zoom] = useState(DEFAULT_ZOOM);
   const mapRef = useRef();
-  const [center, setCenter] = useState(DEFAULT_CENTER);
-  const [zoom, setZoom] = useState(DEFAULT_ZOOM);
 
   // Fetch boundaries on mount
   useEffect(() => {
@@ -53,12 +52,7 @@ function MapMonitor() {
 
   // Function to handle flying to location
   const flyToLocation = (coords, zoom = DEFAULT_ZOOM, boundary = null) => {
-    mapRef.current?.flyTo(coords, zoom, {
-      ...flyToOptions,
-      complete: () => {
-        setSelectedBoundary(boundary ? { ...boundary, center: coords } : null);
-      }
-    });
+    mapRef.current?.flyTo(coords, zoom, { ...flyToOptions });
   };
 
   // Effect to handle flying to boundary when slug changes
@@ -66,37 +60,44 @@ function MapMonitor() {
     if (!mapRef.current) return;
 
     // If no slug, fly to default center
-    if (!slug) {
-      flyToLocation(DEFAULT_CENTER);
-      return;
-    }
+    if (!slug) return;
 
     // If no boundaries yet, do nothing
     if (!boundaries) return;
 
     // Find boundary by slug
     const boundary = boundaries.find(b => b.slug === slug);
-    if (!boundary) {
-      flyToLocation(DEFAULT_CENTER);
-      return;
-    }
+    if (!boundary) return;
 
     // Parse coordinates
     const coords = parseLatlng(boundary.latlng);
     if (!coords) {
       console.error('Invalid boundary latlng:', boundary);
-      flyToLocation(DEFAULT_CENTER);
       return;
     }
 
     // Fly to boundary location
-    flyToLocation(coords, boundary.zoom || 15, boundary);
-    setSelectedBoundary(boundary);
+    flyToLocation(coords, boundary.zoom || 15);
+
+    mapRef.current.once('moveend', () => {
+      setMapSelect(boundary);
+    })
+
+    mapRef.current.once('movestart', () => {
+      setMapSelect(null);
+    })
+
+    return () => {
+      mapRef.current.off('moveend', () => {
+        setMapSelect(null);
+      });
+    }
+    
   }, [slug, boundaries]);
 
   return (
     <div className="relative h-screen">
-      <SideBarMap 
+      <SideBarMap
         isSidebarVisible={isSidebarVisible}
         setIsSidebarVisible={setIsSidebarVisible}
         mapRef={mapRef}
@@ -120,12 +121,13 @@ function MapMonitor() {
           </LayersControl>
         )}
 
-        {/* <MapBoundaries /> */}
-        <MapMarkers />
-        {/* <MapTrackers /> */}
-        {selectedBoundary && selectedBoundary.latlng && (
-          <BoundaryMarker boundary={selectedBoundary} />
+        {mapSelect && mapSelect.latlng && (
+          <>
+            <MapMarkers />
+            <BoundaryMarker />
+          </>
         )}
+
         <ZoomControl position="topright" />
       </MapContainer>
     </div>
