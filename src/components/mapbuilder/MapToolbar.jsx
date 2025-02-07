@@ -1,11 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
-import apiClient from "../../utils/apiClient";
 import { Link } from "react-router";
 import { FaCog, FaBars, FaTrash, FaUpload, FaHome } from "react-icons/fa";
 import { Dropdown, DropdownButton, DropdownMenu, DropdownItem, DropdownFileUpload } from "../Dropdown";
+import apiClient from "../../utils/apiClient";
 
-function MapToolbar({ siteName }) {
+function MapToolbar({ siteName, mapData }) {
+  
   const handleFileUpload = async (file) => {
     try {
       // Check file size (10MB limit)
@@ -14,32 +15,16 @@ function MapToolbar({ siteName }) {
         throw new Error(`File size too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
       }
 
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await apiClient.post('/upload/json', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        // Add timeout and onUploadProgress for better UX
-        timeout: 30000,
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          console.log(`Upload Progress: ${percentCompleted}%`);
-        },
+      const data = await apiClient.upload('/upload/json', file, {mapId: mapData.id}, (progress) => {
+        console.log(`Upload Progress: ${progress}%`);
       });
 
-      const data = await response.data;
       console.log('File uploaded successfully:', data);
-      // Handle success (e.g., show notification, update UI)
+      // window.location.reload(); // Refresh to show new map data
+
     } catch (error) {
       console.error('Error uploading file:', error.message);
-      // Handle error (e.g., show error message)
-      if (error.response?.status === 413) {
-        alert('File size too large. Please try a smaller file.');
-      } else {
-        alert(error.message || 'Error uploading file. Please try again.');
-      }
+      alert(error.message || 'Error uploading file. Please try again.');
     }
   };
 
@@ -57,8 +42,6 @@ function MapToolbar({ siteName }) {
         </div>
 
         <Dropdown>
-
-
           <DropdownButton
             icon={FaBars}
             label=""
@@ -95,6 +78,7 @@ function MapToolbar({ siteName }) {
 
 MapToolbar.propTypes = {
   siteName: PropTypes.string,
+  mapData: PropTypes.object,
 };
 
 export default MapToolbar;

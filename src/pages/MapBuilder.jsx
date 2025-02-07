@@ -39,7 +39,7 @@ const MapBuilder = () => {
   return (
     <div className="h-full flex flex-col bg-gray-600">
       <MapProvider defaultMarkers={nodes || []} defaultGeoJson={geoJsonData} >
-        <MapToolbar siteName={mapView?.name} />
+        {mapView?.name && <MapToolbar siteName={mapView?.name} mapData={mapView} />}
         {isLoading ? (
           <div className="spinner m-auto"></div>
         ) : isError ? (

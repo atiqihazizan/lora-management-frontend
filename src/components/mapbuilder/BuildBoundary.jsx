@@ -21,7 +21,7 @@ const BuildBoundary = ({ id }) => {
 
   const saveGeoJson = useMutation({
     mutationFn: (data) => {
-      return apiClient.put(`/boundary/${id}`, data);
+      return apiClient.put(`/maps/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["mapview"]);

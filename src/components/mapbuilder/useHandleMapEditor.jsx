@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { formatLatLong } from "../../utils/components";
-import apiClient from "../../utils/apiClient";
 import { useStateContext } from "../../utils/useContexts";
+import apiClient from "../../utils/apiClient";
 import debounce from "lodash.debounce";
 
 const useHandleMapEditor = (id, latlng) => {
@@ -10,44 +10,22 @@ const useHandleMapEditor = (id, latlng) => {
   const markerRef = useRef(null);
   const [mapCenter, setMapCenter] = useState([]);
 
-  // Save boundary position with debounce
-  const debouncedSavePosition = useCallback(
-    debounce((newLatLng) => {
-      if (!id || !userInfo?.user_id || !Array.isArray(newLatLng)) {
-        console.error('Invalid data for saving position:', { id, userInfo, newLatLng });
+  // Save map state with debounce
+  const debouncedSaveMapState = useCallback(
+    debounce((updates) => {
+      if (!id || !userInfo?.user_id) {
+        console.error('Invalid data for saving map state:', { id, userInfo, updates });
         return;
       }
 
       try {
-        const formattedLatLng = formatLatLong(newLatLng);
-        apiClient.put(`/maps/fetures/${id}`, {
-          latlng: formattedLatLng,
+        apiClient.put(`/maps/${id}`, {
+          ...updates,
           userid: userInfo.user_id,
         });
-        console.log('Position updated:', formattedLatLng);
+        console.log('Map state updated:', updates);
       } catch (error) {
-        console.error('Error updating position:', error);
-      }
-    }, 500), // tunggu 500ms sebelum hantar ke backend
-    [id, userInfo]
-  );
-
-  // Save boundary zoom level with debounce
-  const debouncedSaveZoom = useCallback(
-    debounce((zoom) => {
-      if (!id || !userInfo?.user_id || typeof zoom !== 'number') {
-        console.error('Invalid data for saving zoom:', { id, userInfo, zoom });
-        return;
-      }
-
-      try {
-        apiClient.put(`/maps/fetures/${id}`, {
-          zoom,
-          userid: userInfo.user_id,
-        });
-        console.log('Zoom updated:', zoom);
-      } catch (error) {
-        console.error('Error updating zoom:', error);
+        console.error('Error updating map state:', error);
       }
     }, 500),
     [id, userInfo]
@@ -55,62 +33,47 @@ const useHandleMapEditor = (id, latlng) => {
 
   // Handle marker drag end
   const handleDragEnd = (lat, lng) => {
-    if (typeof lat !== 'number' || typeof lng !== 'number') {
-      console.error('Invalid coordinates for drag end:', { lat, lng });
-      return;
-    }
-    debouncedSavePosition([lat, lng]);
-    // mainMapRef.current.setView([lat, lng], mainMapRef.current.getZoom());
-    // setMapCenter([lat, lng]);
+    if (typeof lat !== 'number' || typeof lng !== 'number') return;
+    const newLatLng = [lat, lng];
+    debouncedSaveMapState({ latlng: formatLatLong(newLatLng) });
   };
 
   // Handle centering the map
   const handleToCenter = () => {
-    if (!mainMapRef.current || !Array.isArray(latlng)) {
-      console.error('Cannot center map:', { map: mainMapRef.current, latlng });
-      return;
-    }
+    if (!mainMapRef.current || !Array.isArray(latlng)) return;
+    debouncedSaveMapState({ latlng: formatLatLong(latlng) });
     markerRef.current.setLatLng(latlng);
-    debouncedSavePosition(latlng);
     mainMapRef.current.setView(latlng, mainMapRef.current.getZoom());
-    // setMapCenter(latlng);
   };
 
+  // Handle zoom events
+  const handleZoomEnd = useCallback(() => {
+    if (!mainMapRef.current) return;
+    const zoom = mainMapRef.current.getZoom();
+    debouncedSaveMapState({ zoom });
+  }, [debouncedSaveMapState]);
+
   useEffect(() => {
-    if (!mainMapRef.current || !markerRef.current) return;
     const map = mainMapRef.current;
-    const marker = markerRef.current;
+    if (!map) return;
 
-    // const onMoveEnd = () => {
-    //   const center = map.getCenter();
-    //   const newPosition = [center.lat, center.lng];
-    //   markerRef.current.setLatLng(newPosition);
-    //   debouncedSavePosition(newPosition);
-    // };
+    map.on("zoomend", handleZoomEnd);
 
-    const onZoomEnd = () => {
-      const newZoom = map.getZoom();
-      debouncedSaveZoom(newZoom);
-    };
-
-    // map.on("moveend", onMoveEnd);
-    map.on("zoomend", onZoomEnd);
-
+    // Cleanup
     return () => {
-      // map.off("moveend", onMoveEnd);
-      map.off("zoomend", onZoomEnd);
+      map.off("zoomend", handleZoomEnd);
     };
-  }, [mapCenter]); // reactive kepada perubahan mapCenter
+  }, [mapCenter]); // Add map ref to dependencies
 
   useEffect(() => {
     setMapCenter(latlng);
-  },[]);
+  }, [latlng]);
 
   return {
-    handleDragEnd,
-    handleToCenter,
     mainMapRef,
     markerRef,
+    handleDragEnd,
+    handleToCenter,
   };
 };
 
