@@ -2,9 +2,7 @@ import { MapContainer, TileLayer, ZoomControl, LayersControl} from "react-leafle
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMapLayerContext, useStateContext } from "../utils/useContexts";
-import MapBoundaries from "../components/mapmonitor/MapBoundaries";
 import MapMarkers from "../components/mapmonitor/MapMarkers";
-import MapTrackers from "../components/mapmonitor/MapTrackers";
 import BoundaryMarker from "../components/mapmonitor/BoundaryMarker";
 import SideBarMap from "../components/mapmonitor/SideBarMap";
 import apiClient from "../utils/apiClient";
@@ -32,7 +30,7 @@ function MapMonitor() {
   useEffect(() => {
     const fetchBoundaries = async () => {
       try {
-        const response = await apiClient.get("/geofance");
+        const response = await apiClient.get("/maps");
         setBoundaries(response);
       } catch (error) {
         console.error("Error fetching boundaries:", error);

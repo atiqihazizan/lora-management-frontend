@@ -26,14 +26,14 @@ const Geofance = () => {
 
   const { data: tableData, isLoading, isError, error } = useQuery({
     queryKey: ["boundaries"],
-    queryFn: () => apiClient.get("/geofance"),
+    queryFn: () => apiClient.get("/maps"),
   });
 
   const saveMutation = useMutation({
     mutationFn: ({ id, name, latlng, zoom }) => {
       const newdata = { id, name, latlng, zoom, userid: userInfo.user_id };
       const method = editMode ? "put" : "post";
-      const url = editMode ? `/geofance/${id}` : "/geofance";
+      const url = editMode ? `/maps/${id}` : "/maps";
       return apiClient[method](url, newdata);
     },
     onSuccess: () => {
@@ -127,7 +127,7 @@ const Geofance = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this boundary?')) {
       try {
-        await apiClient.delete(`/geofance/${id}`);
+        await apiClient.delete(`/maps/${id}`);
         queryClient.invalidateQueries(["boundaries"]);
       } catch (err) {
         console.error('Failed to delete:', err);

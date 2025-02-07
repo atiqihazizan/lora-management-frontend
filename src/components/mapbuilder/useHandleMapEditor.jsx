@@ -20,7 +20,7 @@ const useHandleMapEditor = (id, latlng) => {
 
       try {
         const formattedLatLng = formatLatLong(newLatLng);
-        apiClient.put(`/geofance/fetures/${id}`, {
+        apiClient.put(`/maps/fetures/${id}`, {
           latlng: formattedLatLng,
           userid: userInfo.user_id,
         });
@@ -41,7 +41,7 @@ const useHandleMapEditor = (id, latlng) => {
       }
 
       try {
-        apiClient.put(`/geofance/fetures/${id}`, {
+        apiClient.put(`/maps/fetures/${id}`, {
           zoom,
           userid: userInfo.user_id,
         });

@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 // Create context
 const DropdownContext = createContext();
 
-// Custom hook untuk access dropdown context
-export const useDropdown = () => {
+// Custom hook to access dropdown context
+const useDropdown = () => {
   const context = useContext(DropdownContext);
   if (!context) {
     throw new Error('useDropdown must be used within a DropdownProvider');
@@ -15,7 +15,7 @@ export const useDropdown = () => {
 };
 
 // Dropdown Provider Component
-export const DropdownProvider = ({ children }) => {
+const DropdownProvider = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const dropdownRef = useRef(null);
@@ -52,7 +52,7 @@ DropdownProvider.propTypes = {
 };
 
 // Dropdown Button Component
-export const DropdownButton = ({ 
+const DropdownButton = ({ 
   icon: Icon, 
   label, 
   className = "", 
@@ -91,7 +91,7 @@ DropdownButton.propTypes = {
 };
 
 // Dropdown Menu Component
-export const DropdownMenu = ({ children, align = 'right' }) => {
+const DropdownMenu = ({ children, align = 'right' }) => {
   const { isOpen, dropdownRef } = useDropdown();
 
   if (!isOpen) return null;
@@ -114,7 +114,7 @@ DropdownMenu.propTypes = {
 };
 
 // Dropdown Item Component
-export const DropdownItem = ({ 
+const DropdownItem = ({ 
   icon: Icon, 
   label, 
   onClick, 
@@ -177,13 +177,69 @@ DropdownItem.propTypes = {
   type: PropTypes.oneOf(['button', 'link', 'both']),
 };
 
+// Dropdown File Upload Component
+const DropdownFileUpload = ({ 
+  icon: Icon, 
+  label, 
+  onFileSelect,
+  accept = "*/*",
+  multiple = false,
+  disabled = false
+}) => {
+  const fileInputRef = useRef(null);
+  const { close } = useDropdown();
+
+  const handleFileSelect = (event) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      onFileSelect(multiple ? Array.from(files) : files[0]);
+      close();
+      // Reset file input
+      event.target.value = '';
+    }
+  };
+
+  const handleClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  return (
+    <div
+      className={`flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer
+        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      onClick={disabled ? undefined : handleClick}
+      role="button"
+      tabIndex={0}
+    >
+      {Icon && <Icon className="mr-3 h-5 w-5" aria-hidden="true" />}
+      <span>{label}</span>
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="hidden"
+        onChange={handleFileSelect}
+        accept={accept}
+        multiple={multiple}
+        disabled={disabled}
+      />
+    </div>
+  );
+};
+
+DropdownFileUpload.propTypes = {
+  icon: PropTypes.elementType,
+  label: PropTypes.string.isRequired,
+  onFileSelect: PropTypes.func.isRequired,
+  accept: PropTypes.string,
+  multiple: PropTypes.bool,
+  disabled: PropTypes.bool,
+};
+
 // Main Dropdown Component
-export const Dropdown = ({ children }) => {
+const Dropdown = ({ children }) => {
   return (
     <DropdownProvider>
-      <div className="relative inline-block text-left">
-        {children}
-      </div>
+      {children}
     </DropdownProvider>
   );
 };
@@ -192,27 +248,12 @@ Dropdown.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-// Usage Example:
-/*
-import { Dropdown, DropdownButton, DropdownMenu, DropdownItem } from './Dropdown';
-import { FaCog, FaTrash, FaUpload } from 'react-icons/fa';
-
-function Example() {
-  return (
-    <Dropdown>
-      <DropdownButton icon={FaCog} label="Options" />
-      <DropdownMenu>
-        <DropdownItem 
-          icon={FaUpload} 
-          label="Upload" 
-          onClick={() => console.log('Upload')} 
-        />
-        <DropdownItem 
-          icon={FaTrash} 
-          label="Delete" 
-          onClick={() => console.log('Delete')} 
-        />
-      </DropdownMenu>
-    </Dropdown>
-  );
-}*/
+export {
+  Dropdown,
+  DropdownButton,
+  DropdownItem,
+  DropdownMenu,
+  DropdownFileUpload,
+  DropdownProvider,
+  useDropdown,
+};
