@@ -120,7 +120,8 @@ const BuildBoundary = ({ id }) => {
           );
         })
       }
-      {isControlsVisible && (
+      {/* Tutup sementara untuk focus pada peta */}
+      {/* {isControlsVisible && (
         <SaveButton
           onClick={() => saveGeoJson.mutateAsync({ bounding: JSON.stringify(geoJsonData) })}
           className="top-[22rem] left-[10px]"
@@ -130,7 +131,7 @@ const BuildBoundary = ({ id }) => {
         onClick={toggleControls}
         className="bottom-[7.5rem] left-[10px]"
         isActive={isControlsVisible}
-      />
+      /> */}
     </>
   );
 };
