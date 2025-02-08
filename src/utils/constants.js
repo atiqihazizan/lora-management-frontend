@@ -1,5 +1,6 @@
 export const units = [
   { label: "Celsius", id: "celsius", symbol: "°C" },
+  { label: "Degrees", id: "degrees", symbol: "°" },
   { label: "Fahrenheit", id: "fahrenheit", symbol: "°F" },
   { label: "Kelvin", id: "kelvin", symbol: "K" },
   { label: "Percent", id: "percent", symbol: "%" },
@@ -9,6 +10,9 @@ export const units = [
   { label: "Kilometer", id: "kilometer", symbol: "km" },
   { label: "Centimeter", id: "centimeter", symbol: "cm" },
   { label: "Millimeter", id: "millimeter", symbol: "mm" },
+  { label: "Meter per Second", id: "meter_per_second", symbol: "m/s" },
+  { label: "Meter per Minute", id: "meter_per_minute", symbol: "m/min" },
+  { label: "Meter per Hour", id: "meter_per_hour", symbol: "m/h" },
   { label: "Mile", id: "mile", symbol: "mi" },
   { label: "Yard", id: "yard", symbol: "yd" },
   { label: "Foot", id: "foot", symbol: "ft" },

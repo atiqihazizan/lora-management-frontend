@@ -12,12 +12,23 @@ const MarkerDevices = ({ data }) => {
   // Safely match MQTT topic
   const matchedData = useMemo(() => {
     try {
+      console.log(topic,mqttData['loramesh/ws/LSMC']);
       return Object.entries(mqttData).find(([t]) => matchTopic(t, (topic || '')));
     } catch (error) {
       console.error('Error matching MQTT topic:', error);
       return null;
     }
   }, [mqttData, topic]);
+
+  // Get value from nested object using key path
+  const getNestedValue = (obj, path) => {
+    try {
+      return path.split('.').reduce((curr, key) => curr?.[key], obj);
+    } catch (error) {
+      console.error('Error accessing nested value:', error);
+      return '';
+    }
+  };
 
   // Safely process props with MQTT data
   const filteredProps = useMemo(() => {
@@ -27,7 +38,7 @@ const MarkerDevices = ({ data }) => {
       return matchedData
         ? prop.map((p) => ({ 
             ...p, 
-            val: String(matchedData[1]?.[p.key] || p.val || '') // Fixed nullish operator
+            val: String(getNestedValue(matchedData[1], p.key) || p.val || '') 
           }))
         : prop.map(p => ({
             ...p,
@@ -40,17 +51,20 @@ const MarkerDevices = ({ data }) => {
   }, [prop, matchedData]);
 
   // Validate center coordinates
-  if (!Array.isArray(center) || center.length !== 2 || 
+  if (!center || !Array.isArray(center) || center.length !== 2 || 
       !center.every(c => typeof c === 'number' && !isNaN(c))) {
     console.error('Invalid center coordinates:', center);
     return null;
   }
 
   return (
-    <Marker 
-      position={center} 
-      icon={IconMarker({ ...etc, prop: filteredProps })} 
-    />
+    <>
+      <Marker
+        position={center}
+        icon={IconMarker({ ...etc, prop: filteredProps })}
+      />
+      {/* <Marker position={center}/> */}
+    </>
   );
 };
 

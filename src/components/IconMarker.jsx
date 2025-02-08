@@ -4,7 +4,10 @@ import L from "leaflet";
 
 const IconMarker = ({ id, name, latlng, prop = [], icon }) => {
   const props = Array.isArray(prop)
-    ? prop.map((p) => `<tr><td><b>${p.label}</b></td><td>:</td><td class="whitespace-nowrap">${p.val} ${p?.unit}</td></tr>`).join("")
+    ? prop.map((p) => `<tr>
+      <td class="whitespace-nowrap"><b>${p.label}</b></td>
+      <td>:</td><td class="whitespace-nowrap">${p.val} ${p?.unit}</td>
+    </tr>`).join("")
     : "";
 
   // const wave = radius > 0 ? `<div class="wave-effect" style="width: ${100 * 13}; height: ${100 * 13};"></div>` : "";
@@ -20,12 +23,12 @@ const IconMarker = ({ id, name, latlng, prop = [], icon }) => {
             ${props}
           </table>
         </div>
-        <div class="text-[25px]">
+        <div class="text-[40px]">
           ${icon && ICONS[icon] ? renderToString(ICONS[icon]) : ""}
         </div>
       </div>`,
-    iconSize: [30, 30],
-    iconAnchor: [13, 23],
+    iconSize: [50, 40],
+    iconAnchor: [20, 37],
     popupAnchor: [0, -20],
   });
 };

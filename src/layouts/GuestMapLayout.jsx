@@ -26,13 +26,6 @@ const GuestMapLayout = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    console.log(mapSelect);
-    function getBoundaries() {
-      
-    }
-  }, [mapSelect]);
-
   return (
     <MapGuestContext.Provider value={{ mapSelect, setMapSelect, markers, guestMaps }}>
       <div className="h-full relative transition-all duration-300 ease-in-out w-full">
