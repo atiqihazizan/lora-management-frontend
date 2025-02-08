@@ -25,7 +25,7 @@ const Geofance = () => {
   const [sorting, setSorting] = useState([]);
 
   const { data: tableData, isLoading, isError, error } = useQuery({
-    queryKey: ["boundaries"],
+    queryKey: ["maps"],
     queryFn: () => apiClient.get("/maps"),
   });
 
@@ -37,7 +37,7 @@ const Geofance = () => {
       return apiClient[method](url, newdata);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["boundaries"]);
+      queryClient.invalidateQueries(["maps"]);
       setIsDialogOpen(false);
     },
   });
@@ -128,7 +128,7 @@ const Geofance = () => {
     if (window.confirm('Are you sure you want to delete this boundary?')) {
       try {
         await apiClient.delete(`/maps/${id}`);
-        queryClient.invalidateQueries(["boundaries"]);
+        queryClient.invalidateQueries(["maps"]);
       } catch (err) {
         console.error('Failed to delete:', err);
         alert('Failed to delete boundary');

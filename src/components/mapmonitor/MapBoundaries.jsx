@@ -1,57 +1,46 @@
 import { GeoJSON } from "react-leaflet";
-import { useContext, useMemo } from "react";
-import { MapLayContext } from "../../utils/Contexts";
+import { useMapGuestContext } from "../../utils/useContexts";
+import { useQuery } from "@tanstack/react-query";
+import apiClient from "../../utils/apiClient";
+import { useMemo } from "react";
+import Loading from "../Loading";
 
 function MapBoundaries() {
-  const context = useContext(MapLayContext) || { markers: [], boundaries: [] };
-  const { boundaries } = context;
+  const { mapSelect } = useMapGuestContext();
 
-  // Validate and process boundaries
-  const validBoundaries = useMemo(() => {
-    try {
-      return (boundaries || []).filter(b => {
-        // Validate GeoJSON data
-        return b && 
-               b.data && 
-               typeof b.data === 'object' &&
-               b.data.type && 
-               b.data.features;
-      });
-    } catch (error) {
-      console.error('Error processing boundaries:', error);
-      return [];
-    }
-  }, [boundaries]);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["mapview", mapSelect?.id],
+    queryFn: async () => await apiClient.get(`/maps/${mapSelect?.id}`),
+    enabled: !!mapSelect?.id,
+    staleTime: 0,
+    // staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: true,
+  });
 
-  return validBoundaries.map((b, i) => {
-    try {
-      return (
-        <GeoJSON
-          key={`boundary_${b.id || i}`}
-          data={b.data}
-          style={{
-            color: b.color || "#3388ff",
-            weight: b.weight || 2,
-            fillOpacity: b.fillOpacity || 0.1
-          }}
-          onEachFeature={(feature, layer) => {
-            try {
-              layer.bindTooltip(b.name || `Boundary ${i + 1}`, {
-                permanent: true,
-                direction: "center",
-                className: "custom-tooltip",
-              });
-            } catch (tooltipError) {
-              console.error('Error binding tooltip:', tooltipError);
-            }
-          }}
-        />
-      );
-    } catch (boundaryError) {
-      console.error('Error rendering boundary:', boundaryError, b);
-      return null;
-    }
-  }).filter(Boolean); // Remove null boundaries
+  if (isLoading) return <Loading />;
+  if (error) return "An error has occurred: " + error.message;
+  const { geojsonData = [] , boundary:map} = data || {};
+  return (
+    <GeoJSON
+      data={geojsonData}
+      style={{
+        color: geojsonData?.color || "#3388ff",
+        weight: geojsonData?.weight || 2,
+        fillOpacity: geojsonData?.fillOpacity || 0.1,
+      }}
+      // onEachFeature={(feature, layer) => {
+      //   try {
+      //     layer.bindTooltip(geojsonData?.name || map?.name, {
+      //       permanent: true,
+      //       direction: "center",
+      //       className: "custom-tooltip",
+      //     });
+      //   } catch (tooltipError) {
+      //     console.error('Error binding tooltip:', tooltipError);
+      //   }
+      // }}
+    />
+  );
 }
 
 export default MapBoundaries;

@@ -1,5 +1,5 @@
 import { createContext } from "react";
-export const MapLayContext = createContext();
+export const MapGuestContext = createContext();
 export const MqttContext = createContext();
 export const MapContext = createContext({
   isDragging: false,

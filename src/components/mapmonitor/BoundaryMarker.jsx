@@ -3,17 +3,17 @@ import L from 'leaflet';
 import { useMemo } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { renderToString } from "react-dom/server";
-import { useMapLayerContext } from "../../utils/useContexts";
+import { useMapGuestContext } from "../../utils/useContexts";
 
 const BoundaryMarker = () => {
-  const { mapSelect } = useMapLayerContext();
+  const { mapSelect } = useMapGuestContext();
 
   // Create custom marker icon
   const markerIcon = useMemo(() => {
     const position = mapSelect.latlng.split(",").map(Number);
     const iconHtml = renderToString(
       <div className="flex flex-col items-center" style={{transform: 'translate(-12px, -48px)'}}>
-        <div className="text-center">
+        <div className="text-center bg-white  bg-opacity-50 shadow-md p-4 rounded-lg">
           <h3 className="font-bold text-lg mb-2 whitespace-nowrap uppercase">{mapSelect.name}</h3>
           {mapSelect.description && (
             <p className="text-sm text-gray-600">{mapSelect.description}</p>
@@ -22,15 +22,18 @@ const BoundaryMarker = () => {
             {position[0].toFixed(6)}, {position[1].toFixed(6)}
           </p>
         </div>
-        <FaMapMarkerAlt className="w-12 h-12 text-red-500 mt-4" />
+        {/* <FaMapMarkerAlt className="w-12 h-12 text-red-500 mt-4" /> */}
       </div>
     );
     return new L.DivIcon({
       className: 'custom-marker',
       html: iconHtml,
-      iconSize: [32, 68],
-      iconAnchor: [4, 68],
-      popupAnchor: [0, -68],
+      // iconSize: [32, 68],
+      // iconAnchor: [4, 68],
+      // popupAnchor: [0, -68],
+      iconSize: [32, 0],
+      iconAnchor: [4, 0],
+      popupAnchor: [0, -0],
     });
   }, [mapSelect.name]);
 

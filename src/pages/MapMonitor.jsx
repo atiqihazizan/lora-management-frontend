@@ -1,11 +1,12 @@
 import { MapContainer, TileLayer, ZoomControl, LayersControl} from "react-leaflet";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useMapLayerContext, useStateContext } from "../utils/useContexts";
-import MapMarkers from "../components/mapmonitor/MapMarkers";
+import { useMapGuestContext, useStateContext } from "../utils/useContexts";
+import BoundaryNodes from "../components/mapmonitor/BoundaryNodes";
 import BoundaryMarker from "../components/mapmonitor/BoundaryMarker";
 import SideBarMap from "../components/mapmonitor/SideBarMap";
 import apiClient from "../utils/apiClient";
+import MapBoundaries from "../components/mapmonitor/MapBoundaries";
 
 const DEFAULT_CENTER = [4.5141, 102.0511]; // Adjusted more west between Kelantan and Pahang
 const DEFAULT_ZOOM = 8;
@@ -18,7 +19,7 @@ const flyToOptions = {
 
 function MapMonitor() {
   const { slug } = useParams();
-  const { mapSelect, setMapSelect, boundaries, setBoundaries = () => {} } = useMapLayerContext();
+  const { mapSelect, setMapSelect, guestMaps, setGuestMaps = () => {} } = useMapGuestContext();
   const { tiles, tilesLoading } = useStateContext();
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [center] = useState(DEFAULT_CENTER);
@@ -30,9 +31,9 @@ function MapMonitor() {
     const fetchBoundaries = async () => {
       try {
         const response = await apiClient.get("/maps");
-        setBoundaries(response);
+        setGuestMaps(response);
       } catch (error) {
-        console.error("Error fetching boundaries:", error);
+        console.error("Error fetching maps:", error);
       }
     };
     fetchBoundaries();
@@ -63,10 +64,10 @@ function MapMonitor() {
     if (!slug) return;
 
     // If no boundaries yet, do nothing
-    if (!boundaries) return;
+    if (!guestMaps) return;
 
     // Find boundary by slug
-    const boundary = boundaries.find(b => b.slug === slug);
+    const boundary = guestMaps.find(b => b.slug === slug);
     if (!boundary) return;
 
     // Parse coordinates
@@ -79,21 +80,15 @@ function MapMonitor() {
     // Fly to boundary location
     flyToLocation(coords, boundary.zoom || 15);
 
-    mapRef.current.once('moveend', () => {
-      setMapSelect(boundary);
-    })
-
-    mapRef.current.once('movestart', () => {
-      setMapSelect(null);
-    })
+    mapRef.current.on('moveend', () => setMapSelect(boundary));
+    mapRef.current.on('movestart', () => setMapSelect(null));
 
     return () => {
-      mapRef.current.off('moveend', () => {
-        setMapSelect(null);
-      });
-    }
-    
-  }, [slug, boundaries]);
+      if(!mapRef.current) return;
+      mapRef.current.off('moveend', () => setMapSelect(null));
+      mapRef.current.off('movestart', () => setMapSelect(null));
+    };
+  }, [slug, guestMaps]);
 
   return (
     <div className="relative h-screen">
@@ -123,7 +118,8 @@ function MapMonitor() {
 
         {mapSelect && mapSelect.latlng && (
           <>
-            <MapMarkers />
+            <MapBoundaries />
+            <BoundaryNodes />
             <BoundaryMarker />
           </>
         )}

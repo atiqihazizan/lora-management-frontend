@@ -1,13 +1,13 @@
 import { useMap } from "react-leaflet";
-import { formatLatLonToArray } from "../../utils/components";
+import { formatLatLonToArray } from "../../utils/components.js";
 import { useMemo } from "react";
-import { useMapLayerContext } from "../../utils/useContexts.js";
-import WaveCircle from "../WaveCircle";
+import { useMapGuestContext } from "../../utils/useContexts.js";
+import WaveCircle from "../WaveCircle.jsx";
 import MarkerDevices from "./MarkerDevices.jsx";
 
-function MapMarkers() {
+function BoundaryNodes() {
   const map = useMap(); // Get map instance
-  const { mapSelect, markers } = useMapLayerContext();
+  const { mapSelect, markers } = useMapGuestContext();
 
   const processedMarkers = useMemo(() => {
     return markers?.map((m) => {
@@ -34,4 +34,4 @@ function MapMarkers() {
   });
 }
 
-export default MapMarkers;
+export default BoundaryNodes;

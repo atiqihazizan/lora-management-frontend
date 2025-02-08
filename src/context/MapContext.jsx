@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { isObjectNotEmpty } from "../../xtrash/constants";
-import { MapContext, MapLayContext } from "../utils/Contexts";
+import { MapContext, MapGuestContext } from "../utils/Contexts";
 import PropTypes from "prop-types";
 import apiClient from "../utils/apiClient";
 import DialogDevice from "../components/DialogDevice";
@@ -163,7 +163,7 @@ const MapProvider = ({
         setCurrentTileIndex,
       }}
     >
-      <MapLayContext.Provider
+      <MapGuestContext.Provider
         value={{
           mapSelect,
           setMapSelect,
@@ -181,7 +181,7 @@ const MapProvider = ({
             onDelete={handleDialogDelete}
           />
         )}
-      </MapLayContext.Provider>
+      </MapGuestContext.Provider>
     </MapContext.Provider>
   );
 };

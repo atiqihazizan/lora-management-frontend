@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { isObjectNotEmpty } from "../../utils/components";
-import { useMapLayerContext, useStateContext } from "../../utils/useContexts";
+import { useMapGuestContext, useStateContext } from "../../utils/useContexts";
 import logo from "../../assets/mesh-network.png";
 import PropTypes from "prop-types";
 import { useCallback, useMemo } from "react";
@@ -9,7 +9,7 @@ import { useCallback, useMemo } from "react";
 const SideBarMap = ({ setIsSidebarVisible, isSidebarVisible, mapRef, onBoundarySelect }) => {
   const navigate = useNavigate();
   const { userInfo } = useStateContext();
-  const { mapSelect = null, boundaries = [] } = useMapLayerContext();
+  const { mapSelect = null, guestMaps = [] } = useMapGuestContext();
 
   // Parse latlng string to array
   const parseLatlng = (latlng) => {
@@ -25,7 +25,7 @@ const SideBarMap = ({ setIsSidebarVisible, isSidebarVisible, mapRef, onBoundaryS
 
   // Memoize valid boundaries
   const validBoundaries = useMemo(() => {
-    return (boundaries || []).filter(b => {
+    return (guestMaps || []).filter(b => {
       if (!isObjectNotEmpty(b)) return false;
       if (typeof b.id !== 'number') return false;
       if (typeof b.slug !== 'string') return false;
@@ -34,7 +34,7 @@ const SideBarMap = ({ setIsSidebarVisible, isSidebarVisible, mapRef, onBoundaryS
       const coords = parseLatlng(b.latlng);
       return coords !== null;
     });
-  }, [boundaries]);
+  }, [guestMaps]);
 
   // Handle boundary click
   const handleBoundaryClick = useCallback((boundary) => {

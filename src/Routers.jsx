@@ -8,7 +8,7 @@ import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import Settings from "./pages/Settings";
 import HeadFootLayout from "./layouts/HeadFootLayout";
-import MapLayout from "./layouts/MapLayout";
+import GuestMapLayout from "./layouts/GuestMapLayout";
 import NotFoundPage from "./pages/NotFound";
 import Tiles from "./pages/Tiles"; // Import the Tiles page
 import Users from "./pages/Users"; // Import the Users page
@@ -18,7 +18,7 @@ import Geofance from "./pages/geofance";
 const routers = createBrowserRouter([
   {
     path: "/map",
-    element: <MapLayout />,
+    element: <GuestMapLayout />,
     children: [
       { path: "", element: <MapMonitor /> },
       {path:":slug", element: <MapMonitor />}
