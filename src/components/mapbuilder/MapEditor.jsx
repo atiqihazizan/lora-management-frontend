@@ -6,11 +6,11 @@ import {
 } from "react-leaflet";
 import { useCallback } from "react";
 import { useStateContext, useMapContext } from "../../utils/useContexts";
-import DroppableMarker from "./MarkerDraggable.jsx";
+import NodeMarker from "./NodeMarker.jsx";
 import BuildBoundary from "./BuildBoundary.jsx";
 import useHandleMapEditor from "./useHandleMapEditor";
 import BoundaryMarker from "./BoundaryMarker.jsx";
-import DroppableAdded from "./DroppableAdded.jsx";
+import DroppedMarker from "./DroppedMarker.jsx";
 import { CenterButton } from "./MapControls";
 
 const MapEditor = ({ data }) => {
@@ -61,12 +61,12 @@ const MapEditor = ({ data }) => {
           ))}
         </LayersControl>
 
-        <DroppableAdded accept="point" mapid={id} />
+        <DroppedMarker accept="point" mapid={id} />
         <BuildBoundary id={id} />
         <ZoomControl position="topleft" />
 
         {markers?.map((marker, i) => (
-          <DroppableMarker key={i} marker={marker} accept="marker" />
+          <NodeMarker key={i} marker={marker} accept="marker" />
         ))}
 
         {data && latlng && (

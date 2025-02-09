@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { formatLatLong } from "../../utils/components";
 import PropTypes from "prop-types";
 
-const DroppableAdded = ({ accept, mapid }) => {
+const DroppedMarker = ({ accept, mapid }) => {
   const { isDragging, openMarkerDialog } = useMapContext()
 
   const map = useMapEvents({
@@ -37,9 +37,9 @@ const DroppableAdded = ({ accept, mapid }) => {
   return isDragging && (<div ref={dropRef} className="marker-droppable-area absolute inset-0"></div>);
 };
 
-DroppableAdded.propTypes = {
+DroppedMarker.propTypes = {
   accept: PropTypes.string.isRequired,
   mapid: PropTypes.number.isRequired,
 };
 
-export default DroppableAdded;
+export default DroppedMarker;

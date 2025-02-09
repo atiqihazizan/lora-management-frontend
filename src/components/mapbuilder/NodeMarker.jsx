@@ -9,7 +9,7 @@ import apiClient from "../../utils/apiClient";
 import React from "react";
 import WaveCircle from "../WaveCircle";
 
-const MarkerDraggable = (({ marker }) => {
+const NodeMarker = (({ marker }) => {
   const map = useMap(); // Get map instance
   const queryClient = useQueryClient();
   const { setMarkers, openMarkerDialog } = useMapContext();
@@ -54,7 +54,7 @@ const MarkerDraggable = (({ marker }) => {
   );
 });
 
-MarkerDraggable.propTypes = {
+NodeMarker.propTypes = {
   marker: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     latlng: PropTypes.oneOfType([PropTypes.string, PropTypes.array]).isRequired,
@@ -66,4 +66,4 @@ MarkerDraggable.propTypes = {
   accept: PropTypes.string.isRequired,
 };
 
-export default React.memo(MarkerDraggable);
+export default React.memo(NodeMarker);
