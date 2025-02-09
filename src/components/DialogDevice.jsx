@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { 
   FaPlus, 
-  FaTrash,
-  FaTimes,
   FaMinusCircle
 } from "react-icons/fa";
 import { ICONS } from "../utils/icons";
@@ -10,20 +8,15 @@ import PropTypes from "prop-types";
 import Dialog from "./Dialog";
 import InputField from "./forms/InputField";
 import SelectField from "./forms/SelectField";
-import { units } from "../utils/constants";
+import apiClient from "../utils/apiClient";
 import { formatLatLong } from "../utils/components";
 
 // Format units untuk SelectField
-const formattedUnits = units.map(unit => ({
-  value: unit.symbol,
-  label: `${unit.label} (${unit.symbol})`
-}));
-
 const DEFAULT_FEATURE = {
   label: "",
   key: "",
   val: "",
-  unit: formattedUnits[0]?.value || "" // Default to first unit
+  unit: "" // Will be set after loading units
 };
 
 const DialogDevice = ({ 
@@ -42,11 +35,37 @@ const DialogDevice = ({
     icon: Object.keys(ICONS)[0] || "" // Default to first icon
   });
   const [error, setError] = useState(null);
+  const [units, setUnits] = useState([]);
   const [icons] = useState(() => 
     Object.keys(ICONS)
       .filter(i => typeof (ICONS[i]) !== 'function' && i)
       .map(String)
   );
+
+  // Load units from API
+  useEffect(() => {
+    const loadUnits = async () => {
+      try {
+        const response = await apiClient.get('/units');
+        // Response langsung array, tak perlu .data
+        const unitsData = response.map(unit => ({
+          value: unit.symbol,
+          label: `${unit.label} (${unit.symbol})`
+        }));
+        setUnits(unitsData);
+        
+        // Update DEFAULT_FEATURE with first unit
+        if (unitsData.length > 0) {
+          DEFAULT_FEATURE.unit = unitsData[0].value;
+        }
+      } catch (error) {
+        console.error('Error loading units:', error);
+        setError('Error loading units data');
+      }
+    };
+    
+    loadUnits();
+  }, []);
 
   // Reset form when initialData changes
   useEffect(() => {
@@ -60,7 +79,7 @@ const DialogDevice = ({
           prop: Array.isArray(initialData.prop) ? initialData.prop.map(p => ({
             ...p,
             val: p.val?.toString() || "", // Convert val to string
-            unit: p.unit || formattedUnits[0]?.value || "" // Default unit
+            unit: p.unit || (units[0]?.value || "") // Default unit from API
           })) : []
         };
         setDeviceData(formattedData);
@@ -85,7 +104,7 @@ const DialogDevice = ({
       });
     }
     setError(null);
-  }, [initialData, isOpen]);
+  }, [initialData, isOpen, units]);
 
   const handleChange = (field) => (e) => {
     setError(null); // Clear error when user makes changes
@@ -313,7 +332,7 @@ const DialogDevice = ({
                     onChange={(e) =>
                       handleChangeFeature(index, "unit", e.target.value)
                     }
-                    options={formattedUnits}
+                    options={units}
                     required
                   />
                 </div>
