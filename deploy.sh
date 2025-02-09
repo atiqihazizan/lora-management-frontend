@@ -41,6 +41,10 @@ npm run build
 print_status "Deploying to server"
 rsync -avz --delete dist/ root@178.128.48.114:/var/www/loramesh/nodejs/public
 
+# Restart server
+print_status "Restarting server"
+ssh root@178.128.48.114 "cd /var/www/loramesh/nodejs && pm2 restart server"
+
 # Push changes if any
 if [[ -n $(git status -s) ]]; then
     print_status "Pushing changes to remote"
