@@ -116,6 +116,7 @@ const Devices = () => {
 
       {dialogOpen && (
         <DialogDevice
+          mode='setting'
           fieldName={["name"]}
           isOpen={dialogOpen}
           onClose={closeDialog}

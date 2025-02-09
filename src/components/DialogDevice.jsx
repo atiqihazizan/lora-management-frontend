@@ -20,6 +20,7 @@ const DEFAULT_FEATURE = {
 };
 
 const DialogDevice = ({ 
+  mode=null,
   fieldName = ["name", "topic"], 
   isOpen, 
   onClose, 
@@ -214,6 +215,8 @@ const DialogDevice = ({
     },
   ].filter(Boolean);
 
+  if(mode === null) return null;
+
   return (
     <Dialog
       isOpen={isOpen}
@@ -268,13 +271,15 @@ const DialogDevice = ({
         <div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium">Features</h3>
-            <button
-              type="button"
-              onClick={handleAddFeature}
-              className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100"
-            >
-              <FaPlus /> Add Feature
-            </button>
+            {mode === 'setting' && (
+              <button
+                type="button"
+                onClick={handleAddFeature}
+                className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100"
+              >
+                <FaPlus /> Add Feature
+              </button>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -283,13 +288,15 @@ const DialogDevice = ({
                 key={index}
                 className="flex flex-wrap items-end gap-2 p-4 bg-gray-50 rounded-lg relative group"
               >
-                <button
-                  type="button"
-                  onClick={() => handleRemoveFeature(index)}
-                  className="absolute top-2 right-2 text-red-500 hover:text-red-600"
-                >
-                  <FaMinusCircle />
-                </button>
+                {mode === 'setting' && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveFeature(index)}
+                    className="absolute top-2 right-2 text-red-500 hover:text-red-600"
+                  >
+                    <FaMinusCircle />
+                  </button>
+                )}
 
                 <div className="flex-1 min-w-[200px]">
                   <InputField
@@ -298,6 +305,7 @@ const DialogDevice = ({
                     onChange={(e) =>
                       handleChangeFeature(index, "label", e.target.value)
                     }
+                    disabled={mode !== 'setting'}
                     required
                   />
                 </div>

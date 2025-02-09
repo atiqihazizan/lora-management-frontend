@@ -2,7 +2,7 @@ import { useDrop } from "react-dnd";
 import { v4 as uuidv4 } from "uuid";
 import { useMapEvents } from "react-leaflet";
 import { useMapContext } from "../../utils/useContexts";
-import { useMutation } from "@tanstack/react-query";
+// import { useMutation } from "@tanstack/react-query";
 import { formatLatLong } from "../../utils/components";
 import PropTypes from "prop-types";
 
@@ -26,10 +26,11 @@ const DroppedMarker = ({ accept, mapid }) => {
         mapid: mapid,
         unixid: uuidv4(),
         latlng: formatLatLong([latLng.lat, latLng.lng].join(",")),
+        type: item.type,
         icon: item.icon,
         prop: item.prop || '[]',
       };
-
+      
       openMarkerDialog(newMarkerData);
     },
   });

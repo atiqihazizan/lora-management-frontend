@@ -174,6 +174,7 @@ const MapProvider = ({
         {children}
         {showDialog && (
           <DialogDevice
+            mode='map'
             isOpen={showDialog}
             onClose={handleDialogClose}
             onSave={handleDialogSave}

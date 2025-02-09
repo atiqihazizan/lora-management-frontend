@@ -12,6 +12,7 @@ const SelectField = ({
   selectClassName = "",
   labelClassName = "",
   groupClassName = "",
+  disabled = false,
 }) => {
   return (
     <div className={`form-group ${groupClassName}`}>
@@ -31,9 +32,10 @@ const SelectField = ({
         id={id}
         value={value}
         onChange={onChange}
+        disabled={disabled}
         className={`w-full px-4 py-2 border ${error ? "border-red-500" : "border-gray-300"
           } rounded-lg focus:outline-none focus:ring-2 ${error ? "focus:ring-red-500" : "focus:ring-blue-500"
-          } focus:border-transparent ${selectClassName}`}
+          } focus:border-transparent ${disabled ? "bg-gray-100 cursor-not-allowed" : ""} ${selectClassName}`}
       >
         <option value="" disabled>{`Select ${labelOptions}`}</option>
         {options.map((option) => (
@@ -68,6 +70,7 @@ SelectField.propTypes = {
   selectClassName: PropTypes.string,
   labelClassName: PropTypes.string,
   groupClassName: PropTypes.string,
+  disabled: PropTypes.bool,
 };
 
 export default SelectField;
