@@ -76,7 +76,7 @@ const Devices = () => {
 
   const columns = [
     { key: "name", label: "Device Name" },
-    // { key: "type", label: "Type" },
+    { key: "type", label: "Type", className: "text-center w-[200px]" },
     // { key: "status", label: "Status" },
   ];
 

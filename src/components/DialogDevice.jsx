@@ -120,7 +120,7 @@ const DialogDevice = ({
     }));
   };
 
-  const handleChangeFeature = (index, field, value) => {
+  const onChangeFeat = (index, field, value) => {
     setError(null); // Clear error when user makes changes
     setDeviceData(prev => {
       const updatedProp = [...prev.prop];
@@ -265,6 +265,15 @@ const DialogDevice = ({
               required
             />
           )}
+
+          {mode === 'setting' && (
+            <InputField
+              label="type"
+              value={deviceData.type}
+              onChange={handleChange("type")}
+              required
+            />
+          )}
         </div>
 
         {/* Features Section */}
@@ -303,7 +312,7 @@ const DialogDevice = ({
                     label="Label"
                     value={feature.label}
                     onChange={(e) =>
-                      handleChangeFeature(index, "label", e.target.value)
+                      onChangeFeat(index, "label", e.target.value)
                     }
                     disabled={mode !== 'setting'}
                     required
@@ -315,7 +324,7 @@ const DialogDevice = ({
                     label="Key"
                     value={feature.key}
                     onChange={(e) =>
-                      handleChangeFeature(index, "key", e.target.value)
+                      onChangeFeat(index, "key", e.target.value)
                     }
                     required
                   />
@@ -326,7 +335,7 @@ const DialogDevice = ({
                     label="Value"
                     value={feature.val}
                     onChange={(e) =>
-                      handleChangeFeature(index, "val", e.target.value)
+                      onChangeFeat(index, "val", e.target.value)
                     }
                     required
                   />
@@ -338,7 +347,7 @@ const DialogDevice = ({
                     label="Unit"
                     value={feature.unit}
                     onChange={(e) =>
-                      handleChangeFeature(index, "unit", e.target.value)
+                      onChangeFeat(index, "unit", e.target.value)
                     }
                     options={units}
                     required
