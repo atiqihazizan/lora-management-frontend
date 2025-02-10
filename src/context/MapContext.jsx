@@ -29,7 +29,6 @@ const MapProvider = ({
 
   const openMarkerDialog = (markerData, onClosed) => {
     try {
-      // Parse prop data if it's a string
       const newProp = typeof markerData?.prop === 'string' 
         ? JSON.parse(markerData.prop || "[]")
         : (markerData?.prop || []);
@@ -37,12 +36,10 @@ const MapProvider = ({
       // Format marker data
       const newDataMarker = { 
         ...markerData, 
-        // Ensure prop values are strings
         prop: newProp.map(p => ({
           ...p,
-          val: (p.val ?? '').toString() // Convert val to string, handle null/undefined
+          val: (p.val ?? '').toString() 
         })),
-        // Ensure latlng is in string format for dialog
         latlng: Array.isArray(markerData?.latlng) 
           ? markerData.latlng.join(',') 
           : markerData?.latlng || ""
@@ -72,6 +69,7 @@ const MapProvider = ({
           mapid: data.mapid,
           unixid: data.unixid,
           latlng: latlngToString(data.latlng),
+          icon:data.icon,
           prop: typeof data.prop === 'string' ? data.prop : JSON.stringify(data.prop)
         };
         
@@ -90,7 +88,7 @@ const MapProvider = ({
           prop: typeof data.prop === 'string' ? JSON.parse(data.prop) : data.prop,
           latlng: Array.isArray(data.latlng) ? data.latlng : formatLatLonToArray(data.latlng)
         };
-
+        
         // Update markers state
         if (editMode) {
           setMarkers((prevMarkers) =>
@@ -131,9 +129,9 @@ const MapProvider = ({
 
   const handleDialogDelete = async (data) => {
     try {
-      await apiClient.delete(`/nodes/${data.id}`);
       setMarkers((prevMarkers) => prevMarkers.filter((marker) => marker.id !== data.id));
-      queryClient.invalidateQueries(["mapview", dialogData.mapid]);
+      // await apiClient.delete(`/nodes/${data.id}`);
+      // queryClient.invalidateQueries(["mapview", dialogData.mapid]);
       handleDialogClose();
     } catch (error) {
       console.error("Failed to delete marker:", error);

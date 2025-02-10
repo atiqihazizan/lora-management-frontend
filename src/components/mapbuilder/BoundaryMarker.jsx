@@ -9,26 +9,39 @@ const BoundaryMarker = ({ boundary, onDragEnd, markerRef }) => {
   // Create custom marker icon
   const markerIcon = useMemo(() => {
     const position = boundary.latlng;
+    // const iconHtml = renderToString(
+    //   <div className="flex flex-col items-center" style={{transform: 'translate(-12px, -48px)'}}>
+    //     <div className="text-center shadow-md p-4 mb-2 rounded-lg">
+    //       <h3 className="font-bold text-lg mb-1 whitespace-nowrap uppercase">{boundary.name}</h3>
+    //       {boundary.description && (
+    //         <p className="text-sm text-gray-600">{boundary.description}</p>
+    //       )}
+    //       <p className="text-xs text-gray-500">
+    //         {position[0].toFixed(6)}, {position[1].toFixed(6)}
+    //       </p>
+    //     </div>
+    //     <FaMapMarkerAlt className="w-12 h-12 text-red-500 mt-1" />
+    //   </div>
+    // );
     const iconHtml = renderToString(
       <div className="flex flex-col items-center" style={{transform: 'translate(-12px, -48px)'}}>
-        <div className="text-center bg-white shadow-md p-4 mb-2 rounded-lg">
-          <h3 className="font-bold text-lg mb-1 whitespace-nowrap uppercase">{boundary.name}</h3>
+        <div className="text-center bg-transparent p-4 mb-2 rounded-lg">
+          <h3 className="font-bold text-2xl mb-1 whitespace-nowrap uppercase">{boundary.name}</h3>
           {boundary.description && (
-            <p className="text-sm text-gray-600">{boundary.description}</p>
+            <p className="text-lg text-gray-600">{boundary.description}</p>
           )}
-          <p className="text-xs text-gray-500">
+          <p className="text-lg text-gray-700">
             {position[0].toFixed(6)}, {position[1].toFixed(6)}
           </p>
         </div>
-        <FaMapMarkerAlt className="w-12 h-12 text-red-500 mt-1" />
       </div>
     );
     return new L.DivIcon({
       className: 'custom-marker',
       html: iconHtml,
       iconSize: [32, 94],
-      iconAnchor: [4, 94],
-      popupAnchor: [0, -94],
+      iconAnchor: [0, 0],
+      popupAnchor: [0, 0],
     });
   }, [boundary.name, boundary.description, boundary.latlng]);
 

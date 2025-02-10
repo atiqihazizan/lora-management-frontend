@@ -4,27 +4,26 @@ import {
   LayersControl, 
   ZoomControl 
 } from "react-leaflet";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useStateContext, useMapContext } from "../../utils/useContexts";
-import NodeMarker from "./NodeMarker.jsx";
+import { CenterButton } from "./MapControls";
 import BuildBoundary from "./BuildBoundary.jsx";
 import useHandleMapEditor from "./useHandleMapEditor";
 import BoundaryMarker from "./BoundaryMarker.jsx";
 import DroppedMarker from "./DroppedMarker.jsx";
-import { CenterButton } from "./MapControls";
+import DevicesMarker from "./DevicesMarker.jsx";
 
 const MapEditor = ({ data }) => {
+  const { markers } = useMapContext();
   const { zoom, id, latlng, name } = data || {};
   const { tiles } = useStateContext();
-  const { markers } = useMapContext();
-  const { 
-    handleDragEnd, 
-    handleToCenter, 
-    mainMapRef, 
-    markerRef 
+  const {
+    handleDragEnd,
+    handleToCenter,
+    mainMapRef,
+    markerRef
   } = useHandleMapEditor(id, latlng);
 
-  // Handle boundary marker drag end
   const onBoundaryDragEnd = useCallback((lat, lng) => {
     if (typeof lat !== "number" || typeof lng !== "number") {
       console.error('Invalid coordinates:', { lat, lng });
@@ -33,8 +32,8 @@ const MapEditor = ({ data }) => {
     handleDragEnd(lat, lng);
   }, [handleDragEnd]);
 
-  if (!tiles || !markers || !data || !latlng) {
-    console.error('Missing required data:', { tiles, markers, data });
+  if (!tiles ||  !data || !latlng) {
+    console.error('Missing required data:', { tiles, data });
     return null;
   }
 
@@ -62,26 +61,19 @@ const MapEditor = ({ data }) => {
         </LayersControl>
 
         {data && latlng && (
-          <>
-            <CenterButton
-              onClick={handleToCenter}
-              className="bottom-16 left-[10px]"
-            />
-            <BoundaryMarker
-              markerRef={markerRef}
-              boundary={data}
-              onDragEnd={onBoundaryDragEnd}
-            />
-          </>
+          <BoundaryMarker
+            markerRef={markerRef}
+            boundary={data}
+            onDragEnd={onBoundaryDragEnd}
+          />
         )}
 
         <DroppedMarker accept="point" mapid={id} />
         <BuildBoundary id={id} />
         <ZoomControl position="topleft" />
+        <CenterButton onClick={handleToCenter} />
 
-        {markers?.map((marker, i) => (
-          <NodeMarker key={i} marker={marker} accept="marker" />
-        ))}
+        {data && latlng && <DevicesMarker />}
       </MapContainer>
     </div>
   );
