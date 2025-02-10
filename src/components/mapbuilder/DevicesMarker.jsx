@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import NodeMarker from "./NodeMarker";
 import { useMapContext } from "../../utils/useContexts";
-import { Polyline } from "react-leaflet";
 import { useMap } from "react-leaflet";
 import L from 'leaflet';
 import 'leaflet-polylinedecorator';
