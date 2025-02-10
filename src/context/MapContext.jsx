@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { isObjectNotEmpty } from "../../xtrash/constants";
 import { MapContext, MapGuestContext } from "../utils/Contexts";
 import PropTypes from "prop-types";
 import apiClient from "../utils/apiClient";
 import DialogDevice from "../components/DialogDevice";
-import { formatLatLonToArray, latlngToString } from "../utils/components";
+import { formatLatLonToArray, isObjectNotEmpty, latlngToString } from "../utils/components";
 
 const MapProvider = ({
   defaultMarkers,

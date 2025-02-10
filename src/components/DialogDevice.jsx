@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 import Dialog from "./Dialog";
 import InputField from "./forms/InputField";
 import SelectField from "./forms/SelectField";
+import { useQuery } from "@tanstack/react-query";
 import apiClient from "../utils/apiClient";
 import { formatLatLong } from "../utils/components";
 
@@ -33,42 +34,82 @@ const DialogDevice = ({
     topic: "",
     prop: [],
     latlng: "",
+    type: 0, // Default type to 0
     icon: Object.keys(ICONS)[0] || "" // Default to first icon
   });
   const [error, setError] = useState(null);
   const [units, setUnits] = useState([]);
+  const [types, setTypes] = useState([]);
   const [icons] = useState(() => 
     Object.keys(ICONS)
       .filter(i => typeof (ICONS[i]) !== 'function' && i)
       .map(String)
   );
 
-  // Load units from API
+  const { 
+    data: unitsData, 
+    isError,
+    isLoading 
+  } = useQuery({
+    queryKey: ['units'],
+    queryFn: async () => {
+      const response = await apiClient.get('/units');
+      return response || []; // Ensure we always return an array
+    },
+    enabled: isOpen, // Only fetch when dialog is open
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+
+  const { 
+    data: deviceTypeData, 
+    isError: deviceTypeError,
+    isLoading: deviceTypeLoading 
+  } = useQuery({
+    queryKey: ['device-types'],
+    queryFn: async () => {
+      const response = await apiClient.get('/device-types');
+      return response || []; // Ensure we always return an array
+    },
+    enabled: isOpen, // Only fetch when dialog is open
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+
+  // Process units data whenever it changes
   useEffect(() => {
-    const loadUnits = async () => {
+    if (unitsData) {
       try {
-        const response = await apiClient.get('/units');
-        // Response langsung array, tak perlu .data
-        const unitsData = response.map(unit => ({
+        const formattedUnits = unitsData.map(unit => ({
           value: unit.symbol,
           label: `${unit.label} (${unit.symbol})`
         }));
-        setUnits(unitsData);
+        setUnits(formattedUnits);
         
         // Update DEFAULT_FEATURE with first unit
-        if (unitsData.length > 0) {
-          DEFAULT_FEATURE.unit = unitsData[0].value;
+        if (formattedUnits.length > 0) {
+          DEFAULT_FEATURE.unit = formattedUnits[0].value;
         }
-      } catch (error) {
-        console.error('Error loading units:', error);
-        setError('Error loading units data');
+      } catch (err) {
+        console.error('Error processing units data:', err);
+        setError('Error processing units data');
       }
-    };
-    
-    loadUnits();
-  }, []);
+    }
 
-  // Reset form when initialData changes
+    if(deviceTypeData){
+      try {
+        const formattedTypes = deviceTypeData.map(type => ({
+          value: type.id,
+          label: type.name
+        }));
+        setTypes(formattedTypes);
+      } catch (err) {
+        console.error('Error processing types data:', err);
+        setError('Error processing types data');
+      }
+    }
+  }, [unitsData, deviceTypeData]);
+
   useEffect(() => {
     if (initialData) {
       try {
@@ -76,6 +117,7 @@ const DialogDevice = ({
         const formattedData = {
           ...initialData,
           icon: initialData.icon || Object.keys(ICONS)[0] || "", // Default icon
+          type: parseInt(initialData.type) || 0, // Convert to integer and default to 0
           latlng: formatLatLong(initialData.latlng || ""),
           prop: Array.isArray(initialData.prop) ? initialData.prop.map(p => ({
             ...p,
@@ -89,6 +131,7 @@ const DialogDevice = ({
         setDeviceData({
           name: initialData.name || "",
           topic: initialData.topic || "",
+          type: 0, // Default to 0
           prop: [],
           latlng: "",
           icon: Object.keys(ICONS)[0] || ""
@@ -99,18 +142,21 @@ const DialogDevice = ({
       setDeviceData({
         name: "",
         topic: "",
+        type: 0, // Default to 0
         prop: [],
         latlng: "",
         icon: Object.keys(ICONS)[0] || ""
       });
     }
-    setError(null);
-  }, [initialData, isOpen, units]);
+  }, [initialData, units]);
 
   const handleChange = (field) => (e) => {
     setError(null); // Clear error when user makes changes
-    const value = e.target.value;
-    setDeviceData(prev => ({ ...prev, [field]: value }));
+    const value = field === 'type' ? parseInt(e.target.value) || 0 : e.target.value;
+    setDeviceData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleAddFeature = () => {
@@ -233,7 +279,7 @@ const DialogDevice = ({
 
       <div className="flex flex-col gap-4">
         {/* Basic Info Section */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           {fieldName.includes("name") && (
             <InputField
               label="Name"
@@ -252,27 +298,31 @@ const DialogDevice = ({
             />
           )}
 
-          {!fieldName.includes("topic") && (
-            <SelectField
-              id="device-icon"
-              label="Icon"
-              value={deviceData.icon}
-              onChange={handleChange("icon")}
-              options={icons.map((icon) => ({
-                value: icon,
-                label: icon,
-              }))}
-              required
-            />
-          )}
-
           {mode === 'setting' && (
-            <InputField
-              label="type"
-              value={deviceData.type}
-              onChange={handleChange("type")}
-              required
-            />
+            <>
+              <SelectField
+                id="device-icon"
+                label="Icon"
+                value={deviceData.icon}
+                onChange={handleChange("icon")}
+                options={icons.map((icon) => ({
+                  value: icon,
+                  label: icon,
+                }))}
+                required
+              />
+              <SelectField
+                id="type"
+                label="Type"
+                value={deviceData.type}
+                onChange={handleChange("type")}
+                options={types.map((type) => ({
+                  value: type.value,
+                  label: type.label,
+                }))}
+                required
+              />
+            </>
           )}
         </div>
 
