@@ -30,14 +30,18 @@ const SelectField = ({
       {/* Select Box */}
       <select
         id={id}
+        name={id}
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className={`w-full px-4 py-2 border ${error ? "border-red-500" : "border-gray-300"
+        className={`block w-full px-4 py-2 text-gray-700 bg-white border ${
+          error
+            ? "border-red-500"
+            : "border-gray-300 hover:border-blue-500"
           } rounded-lg focus:outline-none focus:ring-2 ${error ? "focus:ring-red-500" : "focus:ring-blue-500"
           } focus:border-transparent ${disabled ? "bg-gray-100 cursor-not-allowed" : ""} ${selectClassName}`}
       >
-        <option value="" >{`Select ${labelOptions}`}</option>
+        <option value="">{`Select ${labelOptions}`}</option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

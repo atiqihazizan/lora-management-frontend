@@ -17,7 +17,7 @@ const DEFAULT_FEATURE = {
   label: "",
   key: "",
   val: "",
-  unit: "" // Will be set after loading units
+  unit: "" // Changed back to empty string
 };
 
 const DialogDevice = ({ 
@@ -160,9 +160,9 @@ const DialogDevice = ({
   };
 
   const handleAddFeature = () => {
-    setDeviceData(prev => ({
+    setDeviceData((prev) => ({
       ...prev,
-      prop: [...prev.prop, { ...DEFAULT_FEATURE }],
+      prop: [...(prev.prop || []), { ...DEFAULT_FEATURE }],
     }));
   };
 
