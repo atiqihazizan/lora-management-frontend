@@ -187,21 +187,35 @@ const DialogDevice = ({
   };
 
   const validateForm = () => {
-    // Validate required fields
     if (!deviceData.name?.trim()) {
       setError("Name is required");
       return false;
     }
 
-    // Topic is optional, if present we'll save it
-
-    // Validate features if any exist
     if (deviceData.prop?.length > 0) {
-      const hasEmptyFeature = deviceData.prop.some(
-        (feature) => !feature.label?.trim() || !feature.key?.trim() || feature.val === "" || !feature.unit?.trim()
-      );
-      if (hasEmptyFeature) {
-        setError("Please fill in all fields for each feature");
+      const hasInvalidFeature = deviceData.prop.some(feature => {
+        // Check required fields first
+        if (!feature.label?.trim() || !feature.key?.trim() || feature.val === "") {
+          return true;
+        }
+
+        // If value is a number, unit is required
+        const isNumber = !isNaN(parseFloat(feature.val)) && isFinite(feature.val);
+        if (isNumber && !feature.unit?.trim()) {
+          return true;
+        }
+
+        // If value is a string and not empty, unit is optional
+        const isNonEmptyString = typeof feature.val === 'string' && feature.val.trim() !== '';
+        if (isNonEmptyString) {
+          return false; // Valid even without unit
+        }
+
+        return false;
+      });
+
+      if (hasInvalidFeature) {
+        setError("All feature fields must be filled. Unit is required for numeric values.");
         return false;
       }
     }
@@ -213,12 +227,9 @@ const DialogDevice = ({
     if (!validateForm()) return;
 
     try {
-      // Format data for saving
       const formattedData = {
         ...deviceData,
-        // Keep latlng as string for API, will be converted to array by MapContext
         latlng: deviceData.latlng ? formatLatLong(deviceData.latlng) : "",
-        // Ensure prop is array and val is string
         prop: Array.isArray(deviceData.prop) 
           ? deviceData.prop.map(p => ({
               ...p,

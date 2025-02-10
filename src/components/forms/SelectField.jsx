@@ -37,7 +37,7 @@ const SelectField = ({
           } rounded-lg focus:outline-none focus:ring-2 ${error ? "focus:ring-red-500" : "focus:ring-blue-500"
           } focus:border-transparent ${disabled ? "bg-gray-100 cursor-not-allowed" : ""} ${selectClassName}`}
       >
-        <option value="" disabled>{`Select ${labelOptions}`}</option>
+        <option value="" >{`Select ${labelOptions}`}</option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
