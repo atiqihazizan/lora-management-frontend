@@ -61,14 +61,6 @@ const MapEditor = ({ data }) => {
           ))}
         </LayersControl>
 
-        <DroppedMarker accept="point" mapid={id} />
-        <BuildBoundary id={id} />
-        <ZoomControl position="topleft" />
-
-        {markers?.map((marker, i) => (
-          <NodeMarker key={i} marker={marker} accept="marker" />
-        ))}
-
         {data && latlng && (
           <>
             <CenterButton
@@ -82,6 +74,14 @@ const MapEditor = ({ data }) => {
             />
           </>
         )}
+
+        <DroppedMarker accept="point" mapid={id} />
+        <BuildBoundary id={id} />
+        <ZoomControl position="topleft" />
+
+        {markers?.map((marker, i) => (
+          <NodeMarker key={i} marker={marker} accept="marker" />
+        ))}
       </MapContainer>
     </div>
   );

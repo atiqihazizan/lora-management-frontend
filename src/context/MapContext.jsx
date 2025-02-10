@@ -67,11 +67,14 @@ const MapProvider = ({
         // Format data for API
         const apiData = {
           name: data.name,
+          type: data.type,
           topic: data.topic,
+          mapid: data.mapid,
+          unixid: data.unixid,
           latlng: latlngToString(data.latlng),
           prop: typeof data.prop === 'string' ? data.prop : JSON.stringify(data.prop)
         };
-
+        
         const result = await apiClient[method](url, apiData);
         return { result, data: apiData };
       } catch (error) {
@@ -81,13 +84,10 @@ const MapProvider = ({
     },
     onSuccess: ({ result, data }) => {
       try {
-        // Format data for state update
         const newData = {
           ...data,
           id: editMode ? data.id : result.newId,
-          // Parse prop back to array if it's a string
           prop: typeof data.prop === 'string' ? JSON.parse(data.prop) : data.prop,
-          // Keep latlng as array for map display
           latlng: Array.isArray(data.latlng) ? data.latlng : formatLatLonToArray(data.latlng)
         };
 

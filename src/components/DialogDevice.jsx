@@ -34,8 +34,8 @@ const DialogDevice = ({
     topic: "",
     prop: [],
     latlng: "",
-    type: 0, // Default type to 0
-    icon: Object.keys(ICONS)[0] || "" // Default to first icon
+    type: 0, 
+    icon: "" 
   });
   const [error, setError] = useState(null);
   const [units, setUnits] = useState([]);
@@ -85,11 +85,6 @@ const DialogDevice = ({
           label: `${unit.label} (${unit.symbol})`
         }));
         setUnits(formattedUnits);
-        
-        // Update DEFAULT_FEATURE with first unit
-        if (formattedUnits.length > 0) {
-          DEFAULT_FEATURE.unit = formattedUnits[0].value;
-        }
       } catch (err) {
         console.error('Error processing units data:', err);
         setError('Error processing units data');
@@ -116,13 +111,13 @@ const DialogDevice = ({
         // Format latlng to proper format
         const formattedData = {
           ...initialData,
-          icon: initialData.icon || Object.keys(ICONS)[0] || "", // Default icon
+          icon: initialData.icon || "", 
           type: parseInt(initialData.type) || 0, // Convert to integer and default to 0
           latlng: formatLatLong(initialData.latlng || ""),
           prop: Array.isArray(initialData.prop) ? initialData.prop.map(p => ({
             ...p,
-            val: p.val?.toString() || "", // Convert val to string
-            unit: p.unit || (units[0]?.value || "") // Default unit from API
+            val: p.val?.toString() || "", 
+            unit: p.unit || ""
           })) : []
         };
         setDeviceData(formattedData);
