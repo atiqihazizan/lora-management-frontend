@@ -12,7 +12,6 @@ const MarkerDevices = ({ data }) => {
   // Safely match MQTT topic
   const matchedData = useMemo(() => {
     try {
-      console.log(topic,mqttData['loramesh/ws/LSMC']);
       return Object.entries(mqttData).find(([t]) => matchTopic(t, (topic || '')));
     } catch (error) {
       console.error('Error matching MQTT topic:', error);

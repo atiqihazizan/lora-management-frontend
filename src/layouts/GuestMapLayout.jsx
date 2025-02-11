@@ -17,8 +17,12 @@ const GuestMapLayout = () => {
           apiClient.get("/nodes"),
           apiClient.get("/maps")
         ]);
-        setMarkers(nodes);
         setGuestMaps(maps);
+        const newNodes = nodes.map((node) => ({
+          ...node,
+          prop: node.prop ? JSON.parse(node.prop) : [],
+        }));
+        setMarkers(newNodes);
       } catch (error) {
         console.error("Error fetching data:", error);
       }

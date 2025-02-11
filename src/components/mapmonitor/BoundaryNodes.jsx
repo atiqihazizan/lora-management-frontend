@@ -14,8 +14,10 @@ function BoundaryNodes() {
       try {
         // Use utility function to handle different latlng formats
         const center = formatLatLonToArray(m?.latlng);
-        const prop = m?.prop ? (typeof m.prop === 'string' ? JSON.parse(m.prop) : m.prop) : [];
-        const radius = Array.isArray(prop) ? prop.find((p) => p.key === 'radius')?.val || 0 : 0;
+        // const prop = m?.prop ? (typeof m.prop === 'string' ? JSON.parse(m.prop) : m.prop) : [];
+        // const radius = Array.isArray(prop) ? prop.find((p) => p.key === 'radius')?.val || 0 : 0;
+        const prop = m?.prop || [];
+        const radius = prop.find((p) => p.key === 'radius')?.val || 0;
         return { ...m, center, prop, radius };
       } catch (error) {
         console.error('Error processing marker:', error, m);

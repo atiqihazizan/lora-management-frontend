@@ -7,6 +7,7 @@ import BoundaryMarker from "../components/mapmonitor/BoundaryMarker";
 import SideBarMap from "../components/mapmonitor/SideBarMap";
 import apiClient from "../utils/apiClient";
 import MapBoundaries from "../components/mapmonitor/MapBoundaries";
+import DevicesNode from "../components/mapmonitor/DevicesNode";
 
 const DEFAULT_CENTER = [4.5141, 102.0511]; // Adjusted more west between Kelantan and Pahang
 const DEFAULT_ZOOM = 8;
@@ -121,6 +122,7 @@ function MapMonitor() {
             <MapBoundaries />
             <BoundaryNodes />
             <BoundaryMarker />
+            <DevicesNode />
           </>
         )}
 
