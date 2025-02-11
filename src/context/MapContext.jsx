@@ -130,8 +130,8 @@ const MapProvider = ({
   const handleDialogDelete = async (data) => {
     try {
       setMarkers((prevMarkers) => prevMarkers.filter((marker) => marker.id !== data.id));
-      // await apiClient.delete(`/nodes/${data.id}`);
-      // queryClient.invalidateQueries(["mapview", dialogData.mapid]);
+      await apiClient.delete(`/nodes/${data.id}`);
+      queryClient.invalidateQueries(["mapview", dialogData.mapid]);
       handleDialogClose();
     } catch (error) {
       console.error("Failed to delete marker:", error);

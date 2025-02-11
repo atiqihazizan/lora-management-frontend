@@ -5,6 +5,7 @@ import { FaCog, FaBars, FaTrash, FaUpload, FaHome } from "react-icons/fa";
 import { Dropdown, DropdownButton, DropdownMenu, DropdownItem, DropdownFileUpload } from "../Dropdown";
 import apiClient from "../../utils/apiClient";
 import { useMapContext } from "../../utils/useContexts";
+import { FaTimeline } from "react-icons/fa6";
 
 function MapToolbar({ siteName, mapData }) {
   const { setGeoJsonData } = useMapContext();
@@ -59,16 +60,33 @@ function MapToolbar({ siteName, mapData }) {
               multiple={false}
             />
             <DropdownItem
-              icon={FaCog}
-              label="Settings"
-              href="/settings"
-              type="link"
+              icon={FaTimeline}
+              label="Topic"
+              onClick={async () => { 
+                const topic = window.prompt("Enter topic:",mapData.topic);
+                if (topic) {
+                  try {
+                    await apiClient.put(`/maps/${mapData.id}`, { topic });
+                    alert("Topic updated successfully");
+                  } catch (error) {
+                    console.error("Failed to update topic:", error);
+                    // alert("Failed to update topic");
+                  }
+                }
+              }}
             />
             <DropdownItem
               icon={FaTrash}
               label="Delete"
               onClick={() => { }}
               disabled={true}
+            />
+            <hr />
+            <DropdownItem
+              icon={FaCog}
+              label="Settings"
+              href="/settings"
+              type="link"
             />
           </DropdownMenu>
         </Dropdown>
