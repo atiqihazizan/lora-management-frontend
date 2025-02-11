@@ -116,6 +116,7 @@ const DevicesNode = () => {
 					dashArray: '5, 10',
 					opacity: 0.7
 				}}
+				showArrows={true}
 			/>
 		</>
 	);
