@@ -59,7 +59,8 @@ function MapToolbar({ siteName, mapData }) {
               accept=".kml,.kmz,.geojson,.json"
               multiple={false}
             />
-            <DropdownItem
+            {/* Tutup sementara */}
+            {/* <DropdownItem
               icon={FaTimeline}
               label="Topic"
               onClick={async () => { 
@@ -74,7 +75,7 @@ function MapToolbar({ siteName, mapData }) {
                   }
                 }
               }}
-            />
+            /> */}
             <DropdownItem
               icon={FaTrash}
               label="Delete"
