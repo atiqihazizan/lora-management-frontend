@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import apiClient from "../utils/apiClient";
 import { MapGuestContext } from "../utils/Contexts";
+import apiClient from "../utils/apiClient";
+import SideBarMap from "../components/mapmonitor/SideBarMap";
 
 const GuestMapLayout = () => {
   const [mapSelect, setMapSelect] = useState(null);
@@ -12,16 +13,16 @@ const GuestMapLayout = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [nodes, maps] = await Promise.all([
-          apiClient.get("/nodes"),
+        const [maps] = await Promise.all([
+          // apiClient.get("/nodes"),
           apiClient.get("/maps")
         ]);
         setGuestMaps(maps);
-        const newNodes = nodes.map((node) => ({
-          ...node,
-          prop: node.prop ? JSON.parse(node.prop) : [],
-        }));
-        setMarkers(newNodes);
+        // const newNodes = nodes.map((node) => ({
+        //   ...node,
+        //   prop: node.prop ? JSON.parse(node.prop) : [],
+        // }));
+        // setMarkers(newNodes);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -33,7 +34,14 @@ const GuestMapLayout = () => {
     <MapGuestContext.Provider value={{ mapSelect, setMapSelect, markers, guestMaps }}>
       <div className="h-full relative transition-all duration-300 ease-in-out w-full">
         <div className="relative w-full h-full">
-          <Outlet />
+
+          <div className="relative h-screen">
+            <SideBarMap
+              isSidebarVisible={isSidebarVisible}
+              setIsSidebarVisible={setIsSidebarVisible}
+            />
+            <Outlet />
+          </div>
         </div>
       </div>
     </MapGuestContext.Provider>

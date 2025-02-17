@@ -23,7 +23,6 @@ function MapMonitor() {
   const { slug } = useParams();
   const { mapSelect, setMapSelect, guestMaps, setGuestMaps = () => {} } = useMapGuestContext();
   const { tiles, tilesLoading } = useStateContext();
-  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [center,setCenter] = useState(DEFAULT_CENTER);
   const [zoom,setZoom] = useState(DEFAULT_ZOOM);
   const mapRef = useRef();
@@ -84,30 +83,22 @@ function MapMonitor() {
     setCenter(coords);
     setZoom(boundary.zoom || 15);
     mapRef.current.on('moveend', () => setMapSelect(boundary));
-    mapRef.current.on('movestart', () => setMapSelect(null));
+    // mapRef.current.on('movestart', () => setMapSelect(null));
 
     return () => {
       if(!mapRef.current) return;
       mapRef.current.off('moveend', () => setMapSelect(null));
-      mapRef.current.off('movestart', () => setMapSelect(null));
+      // mapRef.current.off('movestart', () => setMapSelect(null));
     };
   }, [slug, guestMaps]);
 
   return (
-    <div className="relative h-screen">
-      <SideBarMap
-        isSidebarVisible={isSidebarVisible}
-        setIsSidebarVisible={setIsSidebarVisible}
-        mapRef={mapRef}
-      />
       <MapContainer
         ref={mapRef}
         center={center}
         zoom={zoom}
         className="h-full w-full"
         zoomControl={false}
-        // scrollWheelZoom={true}
-        // dragging={true}
         maxZoom={18}
         minZoom={4}
         maxBounds={[[-90, -180], [90, 180]]}
@@ -124,7 +115,7 @@ function MapMonitor() {
           </LayersControl>
         )}
 
-        {mapSelect && mapSelect.latlng && (
+        {mapSelect?.latlng && (
           <>
             <MapBoundaries />
             <BoundaryNodes />
@@ -136,7 +127,6 @@ function MapMonitor() {
         <BoundaryCenter mapRef={mapRef} zoom={zoom} center={center} />
         <ZoomControl position="topright" />
       </MapContainer>
-    </div>
   );
 }
 

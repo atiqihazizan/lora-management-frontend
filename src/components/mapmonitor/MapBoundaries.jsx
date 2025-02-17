@@ -12,14 +12,16 @@ function MapBoundaries() {
     queryKey: ["mapview", mapSelect?.id],
     queryFn: async () => await apiClient.get(`/maps/${mapSelect?.id}`),
     enabled: !!mapSelect?.id,
-    staleTime: 0,
-    // staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 5, // Cache data selama 5 minit
+    refetchOnWindowFocus: false, // Tidak fetch data baru bila window focus
+    refetchOnMount: false, // Tidak fetch data baru bila component mount
+    cacheTime: 1000 * 60 * 10, // Simpan cache selama 10 minit
   });
-
   if (isLoading) return <Loading />;
   if (error) return "An error has occurred: " + error.message;
-  const { geojsonData = [] , boundary:map} = data || {};
+  const { geojsonData = []} = data || {};
+console.log(1234)
+
   return (
     <GeoJSON
       data={geojsonData}

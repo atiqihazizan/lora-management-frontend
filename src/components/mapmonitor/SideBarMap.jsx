@@ -6,7 +6,7 @@ import logo from "../../assets/mesh-network.png";
 import PropTypes from "prop-types";
 import { useCallback, useMemo } from "react";
 
-const SideBarMap = ({ setIsSidebarVisible, isSidebarVisible, mapRef, onBoundarySelect }) => {
+const SideBarMap = ({ setIsSidebarVisible, isSidebarVisible }) => {
   const navigate = useNavigate();
   const { userInfo } = useStateContext();
   const { mapSelect = null, guestMaps = [] } = useMapGuestContext();
@@ -137,10 +137,6 @@ const SideBarMap = ({ setIsSidebarVisible, isSidebarVisible, mapRef, onBoundaryS
 SideBarMap.propTypes = {
   setIsSidebarVisible: PropTypes.func.isRequired,
   isSidebarVisible: PropTypes.bool.isRequired,
-  mapRef: PropTypes.shape({
-    current: PropTypes.object
-  }),
-  onBoundarySelect: PropTypes.func
 };
 
 export default SideBarMap;
