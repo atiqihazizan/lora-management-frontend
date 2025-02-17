@@ -8,6 +8,7 @@ import SideBarMap from "../components/mapmonitor/SideBarMap";
 import apiClient from "../utils/apiClient";
 import MapBoundaries from "../components/mapmonitor/MapBoundaries";
 import DevicesNode from "../components/mapmonitor/DevicesNode";
+import BoundaryCenter from "../components/mapmonitor/ BoundaryCenter";
 
 const DEFAULT_CENTER = [4.5141, 102.0511]; // Adjusted more west between Kelantan and Pahang
 const DEFAULT_ZOOM = 8;
@@ -23,8 +24,8 @@ function MapMonitor() {
   const { mapSelect, setMapSelect, guestMaps, setGuestMaps = () => {} } = useMapGuestContext();
   const { tiles, tilesLoading } = useStateContext();
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-  const [center] = useState(DEFAULT_CENTER);
-  const [zoom] = useState(DEFAULT_ZOOM);
+  const [center,setCenter] = useState(DEFAULT_CENTER);
+  const [zoom,setZoom] = useState(DEFAULT_ZOOM);
   const mapRef = useRef();
 
   // Fetch boundaries on mount
@@ -80,7 +81,8 @@ function MapMonitor() {
 
     // Fly to boundary location
     flyToLocation(coords, boundary.zoom || 15);
-
+    setCenter(coords);
+    setZoom(boundary.zoom || 15);
     mapRef.current.on('moveend', () => setMapSelect(boundary));
     mapRef.current.on('movestart', () => setMapSelect(null));
 
@@ -104,8 +106,14 @@ function MapMonitor() {
         zoom={zoom}
         className="h-full w-full"
         zoomControl={false}
-        scrollWheelZoom={true}
-        dragging={true}
+        // scrollWheelZoom={true}
+        // dragging={true}
+
+        maxZoom={18}
+        minZoom={4}
+        maxBounds={[[-90, -180], [90, 180]]}
+        maxBoundsViscosity={1.0}
+        preferCanvas={true}
       >
         {!tilesLoading && (
           <LayersControl position="topright">
@@ -126,6 +134,7 @@ function MapMonitor() {
           </>
         )}
 
+        <BoundaryCenter mapRef={mapRef} zoom={zoom} center={center} />
         <ZoomControl position="topright" />
       </MapContainer>
     </div>

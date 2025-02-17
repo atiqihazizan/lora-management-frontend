@@ -1,124 +1,120 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useMapGuestContext } from "../../utils/useContexts";
 import { useMap } from "react-leaflet";
 import MeshConnections from "../MeshConnections";
-import { useMqtt } from "../../utils/useContexts";
-import { matchTopic } from "../../utils/components";
+import BrokerClient from "../../utils/brokerClient";
 
-// Function to generate connections based on marker order
-const generateOrderedConnections = (markers) => {
-	if (!markers || markers.length === 0) return [];
+function DeviceStatus() {
+  const [meshConnections, setMeshConnections] = useState([]);
+  const { markers, mapSelect } = useMapGuestContext();
+  const map = useMap();
+  const brokerRef = useRef(null);
+  const [isConnected, setIsConnected] = useState(false);
 
-	// Filter mesh nodes (type 2) and sort by mesh value
-	const meshNodes = markers
-		.filter(m => m.type === 2)
-		.map(node => ({
-			...node,
-			meshValue: node.prop?.find(p => p.key === 'mesh')?.val || ''
-		}))
-		.sort((a, b) => a.meshValue.localeCompare(b.meshValue));
-
-	if (meshNodes.length < 2) return [];
-
-	// Create connections following marker order
-	const connections = [];
-	for (let i = 0; i < meshNodes.length - 1; i++) {
-		connections.push([
-			meshNodes[i].meshValue,
-			meshNodes[i + 1].meshValue
-		]);
-	}
-
-	// Close the loop by connecting back to first node
-	connections.push([
-		meshNodes[meshNodes.length - 1].meshValue,
-		meshNodes[0].meshValue
-	]);
-
-	return connections;
-};
-
-// Function to generate MQTT connections
-const generateMqttConnections = (markers, mqttData) => {
-	if (!markers || markers.length === 0 || !mqttData) return [];
-
-	try {
-		// Get mesh nodes map for quick lookup
-		const meshNodesMap = markers
-			.filter(m => m.type === 2)
-			.reduce((acc, node) => {
-				const meshValue = node.prop?.find(p => p.key === 'mesh')?.val;
-				if (meshValue) acc[meshValue] = node;
-				return acc;
-			}, {});
-
-		// Find random_mesh topic data
-		const randomMeshData = Object.entries(mqttData)
-			.find(([topic]) => matchTopic(topic, 'random_mesh'));
-			
-			if (!randomMeshData) return [];
-			
-			const [_, data] = randomMeshData;
-
-			return data.length < 2 ?  [] : data;
-	} catch (error) {
-		console.error('Error processing MQTT data:', error);
-		return [];
-	}
-};
-
-const DevicesNode = () => {
-	const [meshConnections, setMeshConnections] = useState([]);
-	const [isInitialized, setIsInitialized] = useState(false);
-	const { mapSelect, markers } = useMapGuestContext();
-	const { mqttData } = useMqtt();
-	const map = useMap();
-
-	// Get available nodes
-	const availableNodes = useMemo(() => 
-		markers?.filter(m => m.mapid === mapSelect?.id) || [],
-		[markers, mapSelect]
-	);
-
-	// Process MQTT connections with useMemo to prevent unnecessary recalculations
-	const mqttConnections = useMemo(() => 
-		generateMqttConnections(availableNodes, mqttData),
-		[availableNodes, mqttData]
-	);
-
-	// Initialize with ordered connections
-	useEffect(() => {
-		if (mapSelect && availableNodes?.length >= 2 && !isInitialized) {
-			const orderedConnections = generateOrderedConnections(availableNodes);
-			setMeshConnections(orderedConnections);
-			setIsInitialized(true);
+ // Initialize broker on mount
+ useEffect(() => {
+	brokerRef.current = new BrokerClient();
+	return () => {
+		if (brokerRef.current) {
+			brokerRef.current.disconnect();
 		}
-	}, [mapSelect, availableNodes, isInitialized]);
+	};
+}, []);
 
-	// Update connections when MQTT data changes
-	useEffect(() => {
-		if (isInitialized && mqttConnections.length > 0) {
-			setMeshConnections(mqttConnections);
-		}
-	}, [mqttConnections, isInitialized]);
+  // Get available nodes and group them by topic
+  const { topics, nodesByTopic } = useMemo(() => {
+    const allNodes = markers?.filter(m => m.type === 2 && m.mapid === mapSelect?.id) || [];
+    const topics = [...new Set(allNodes.map(item => item.topic))];
+    const nodesByTopic = topics.map(topic => 
+      allNodes.filter(node => node.topic === topic)
+    );
+    return { topics, nodesByTopic };
+  }, [markers, mapSelect]);
 
-	if (!mapSelect || availableNodes?.length === 0) return <></>;
+  useEffect(() => {
+    if (!mapSelect?.id || !brokerRef.current) return;
 
-	return (
-		<>
-			<MeshConnections
-				markers={markers}
-				meshConnections={meshConnections}
-				map={map}
-				lineOptions={{
-					color: '#dc2626',
-					weight: 5,
-					dashArray: '5, 10',
-					opacity: 0.7
-				}}
-			/>
-		</>
-	);
+    let isSubscribed = true;
+
+    const handleMessage = (i, topic, message) => {
+      if (!isSubscribed) return;
+      
+      try {
+        if (!message) {
+          console.error('Empty MQTT message received');
+          return;
+        }
+        const mqttData = JSON.parse(message);
+        
+        setMeshConnections(prevConnections => {
+          const newConnections = [...(prevConnections || [])];
+          newConnections[i] = mqttData;
+          return newConnections;
+        });
+      } catch (error) {
+        console.error('Error processing MQTT message:', error);
+        setMeshConnections([]);
+      }
+    };
+
+    // Initialize meshConnections array with empty values for each topic
+    setMeshConnections(new Array(topics.length).fill(null));
+
+
+    const connectAndSubscribe = async () => {
+      try {
+        if (!isConnected) {
+          brokerRef.current.connect();
+          setIsConnected(true);
+        }
+
+        brokerRef.current.onConnect(() => {
+          if (isMounted) {
+            brokerRef.current.subscribe(topic, handleMessage);
+          }
+        });
+      } catch (error) {
+        console.error('MQTT setup error:', error);
+      }
+    };
+
+    // Connect and subscribe
+    connectAndSubscribe();
+
+    brokerRef.current.onConnect(() => {
+      if (isSubscribed) {
+        topics.forEach((topic, i) => {
+          brokerRef.current.subscribe(topic, (t, m) => handleMessage(i, t, m));
+        });
+      }
+    });
+
+    // Cleanup function
+    return () => {
+      isSubscribed = false;
+      brokerRef.current.disconnect();
+      setIsConnected(false);
+    };
+  }, [mapSelect?.id, topics]); // Updated dependency to topics
+
+  if (!mapSelect || nodesByTopic.length === 0) return null;
+
+  return (
+    meshConnections.map((mc, i) => mc && (
+      <MeshConnections
+        key={i}
+        meshConnections={mc}
+        markers={nodesByTopic[i]}
+        map={map}
+        lineOptions={{
+          color: '#dc2626',
+          weight: 3,
+          dashArray: '5, 10',
+          opacity: 0.7
+        }}
+      />
+    ))
+  );
 };
 
-export default React.memo(DevicesNode);
+export default DeviceStatus;
