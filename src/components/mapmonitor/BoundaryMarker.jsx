@@ -13,7 +13,7 @@ const BoundaryMarker = () => {
     const position = mapSelect.latlng.split(",").map(Number);
     const iconHtml = renderToString(
       <div className="flex flex-col items-center" style={{transform: 'translate(-12px, -48px)'}}>
-        <div className="text-center bg-white  bg-opacity-50 shadow-md p-4 rounded-lg">
+        <div className="text-center shadow-md p-4 rounded-lg">
           <h3 className="font-bold text-lg mb-2 whitespace-nowrap uppercase">{mapSelect.name}</h3>
           {mapSelect.description && (
             <p className="text-sm text-gray-600">{mapSelect.description}</p>
