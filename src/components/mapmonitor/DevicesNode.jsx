@@ -4,7 +4,7 @@ import { useMap } from "react-leaflet";
 import MeshConnections from "../MeshConnections";
 import BrokerClient from "../../utils/brokerClient";
 
-function DeviceStatus() {
+function DevicesNode() {
   const [meshConnections, setMeshConnections] = useState([]);
   const { markers, mapSelect } = useMapGuestContext();
   const map = useMap();
@@ -117,4 +117,4 @@ function DeviceStatus() {
   );
 };
 
-export default DeviceStatus;
+export default DevicesNode;

@@ -143,16 +143,6 @@ const MeshConnections = ({
 		};
 	}, [connections, map, lineOptions, showArrows]);
 
-	// Debug log
-	useEffect(() => {
-		console.log('MeshConnections render:', {
-			markersCount: markers?.length,
-			connectionsCount: connections.length,
-			showArrows,
-			hasMap: !!map
-		});
-	}, [markers, connections, showArrows, map]);
-
 	return null;
 };
 

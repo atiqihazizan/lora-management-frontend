@@ -1,23 +1,26 @@
 import IconMarker from "../IconMarker";
 import PropTypes from "prop-types";
 import { Marker } from "react-leaflet";
-import { useMemo } from "react";
-import { matchTopic } from "../../utils/components";
-import { useMqtt } from "../../utils/useContexts";
+import { useEffect, useMemo, useState, useRef } from "react";
+import BrokerClient from "../../utils/brokerClient";
 
-const MarkerDevices = ({ data }) => {
-  const { center, prop, topic, ...etc } = data;
-  const { mqttData } = useMqtt();
-
-  // Safely match MQTT topic
-  const matchedData = useMemo(() => {
-    try {
-      return Object.entries(mqttData).find(([t]) => matchTopic(t, (topic || '')));
-    } catch (error) {
-      console.error('Error matching MQTT topic:', error);
-      return null;
-    }
-  }, [mqttData, topic]);
+const MarkerDevices = ({ data, topic }) => {
+  const { center, prop, type, ...etc } = data;
+  const [propMqtt, setPropMqtt] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
+  
+  // Use ref for broker to persist across re-renders
+  const brokerRef = useRef(null);
+  
+  // Initialize broker on mount
+  useEffect(() => {
+    brokerRef.current = new BrokerClient();
+    return () => {
+      if (brokerRef.current) {
+        brokerRef.current.disconnect();
+      }
+    };
+  }, []);
 
   // Get value from nested object using key path
   const getNestedValue = (obj, path) => {
@@ -29,42 +32,87 @@ const MarkerDevices = ({ data }) => {
     }
   };
 
-  // Safely process props with MQTT data
-  const filteredProps = useMemo(() => {
-    try {
-      if (!Array.isArray(prop)) return [];
+  // Memoize MQTT message handler
+  const handleMessage = useMemo(() => {
+    return (_,message) => {
+      const mqttData = JSON.parse(message);
       
-      return matchedData
-        ? prop.map((p) => ({ 
-            ...p, 
-            val: String(getNestedValue(matchedData[1], p.key) || p.val || '') 
-          }))
-        : prop.map(p => ({
-            ...p,
-            val: String(p.val || '') // Ensure val is string
-          }));
-    } catch (error) {
-      console.error('Error processing props:', error);
-      return [];
-    }
-  }, [prop, matchedData]);
+      if (!Array.isArray(prop)) return [];
+
+      try {
+        const newProps = mqttData
+          ? prop.map((p) => ({ 
+              ...p, 
+              val: String(getNestedValue(mqttData, p.key) || p.val || '') 
+            }))
+          : prop.map(p => ({
+              ...p,
+              val: String(p.val || '')
+            }));
+        setPropMqtt(newProps);
+      } catch (error) {
+        console.error('Error processing props:', error);
+      }
+    };
+  }, [prop]);
+
+  // Effect for MQTT connection
+  useEffect(() => {
+    if (type === 2 || !topic || !brokerRef.current) return;
+    let isMounted = true;
+
+    const connectAndSubscribe = async () => {
+      try {
+        if (!isConnected) {
+          brokerRef.current.connect();
+          setIsConnected(true);
+        }
+
+        brokerRef.current.onConnect(() => {
+          if (isMounted) {
+            brokerRef.current.subscribe(topic, handleMessage);
+          }
+        });
+      } catch (error) {
+        console.error('MQTT setup error:', error);
+      }
+    };
+
+    connectAndSubscribe();
+
+    return () => {
+      isMounted = false;
+      if (isConnected) {
+        brokerRef.current.disconnect();
+        setIsConnected(false);
+      }
+    };
+  }, [topic, type, handleMessage, isConnected]);
+
+  // Memoize marker icon
+  const markerIcon = useMemo(() => {
+    return IconMarker({
+      ...etc,
+      prop: propMqtt.length ? propMqtt : prop
+    });
+  }, [etc, prop, propMqtt]);
 
   // Validate center coordinates
-  if (!center || !Array.isArray(center) || center.length !== 2 || 
-      !center.every(c => typeof c === 'number' && !isNaN(c))) {
+  if (!center || !Array.isArray(center) || center.length !== 2 ||
+    !center.every(c => typeof c === 'number' && !isNaN(c))) {
     console.error('Invalid center coordinates:', center);
     return null;
   }
 
-  return (
-    <>
+  // Memoize marker component
+  return useMemo(() => {
+    return (
       <Marker
         position={center}
-        icon={IconMarker({ ...etc, prop: filteredProps })}
+        icon={markerIcon}
       />
-      {/* <Marker position={center}/> */}
-    </>
-  );
+    );
+  }, [center, markerIcon]);
 };
 
 MarkerDevices.propTypes = {

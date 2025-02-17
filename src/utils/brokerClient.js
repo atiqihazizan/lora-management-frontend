@@ -8,33 +8,49 @@ class BrokerClient {
       keepalive: 60,
       reconnectPeriod: 5000,
       connectTimeout: 30000,
+      // username: 'lora2u_admin',
+      // password: 'lora2u@2024',
+      clean: true,
+      rejectUnauthorized: false,
+      protocolVersion: 4,
+      clientId: `lora2u_${Math.random().toString(16).substring(2, 10)}`
     };
     this.client = null;
-    this.isReconnecting = false; // Flag to prevent multiple simultaneous reconnect attempts
-    this.onConnectCallback = null; // Callback for onConnect event
-    this.pendingSubscriptions = []; // Simpan topik yang belum dilanggan
+    this.isReconnecting = false;
+    this.onConnectCallback = null;
+    this.pendingSubscriptions = [];
+    this.messageHandlers = new Map();
   }
 
-  // Connect to the broker
   connect() {
+    if (this.client?.connected) return;
+    
     if (!this.client) {
-      this.client = mqtt.connect(this.brokerUrl, {
-        ...this.options,
-        reconnectPeriod: 5000, // Attempt to reconnect every 5 seconds
-      });
+      this.client = mqtt.connect(this.brokerUrl, this.options);
 
       this.client.on("connect", () => {
-        console.log("Real-Time is ready");
-        this.isReconnecting = false; // Reset reconnect flag upon successful connection
+        this.isReconnecting = false;
+        
         if (this.onConnectCallback) {
-          this.onConnectCallback(); // Call the onConnect callback if set
+          this.onConnectCallback();
         }
 
-        // Langgan semua topik yang tertangguh
+        // Subscribe to pending topics
         this.pendingSubscriptions.forEach(({ topic, callback }) => {
           this.subscribe(topic, callback);
         });
-        this.pendingSubscriptions = []; // Kosongkan senarai langganan tertangguh
+        this.pendingSubscriptions = [];
+      });
+
+      this.client.on("message", (topic, payload) => {
+        const handlers = this.messageHandlers.get(topic) || [];
+        handlers.forEach(callback => {
+          try {
+            callback(topic, payload.toString());
+          } catch (error) {
+            console.error(`Error in message handler for topic ${topic}:`, error);
+          }
+        });
       });
 
       this.client.on("error", (err) => {
@@ -42,84 +58,71 @@ class BrokerClient {
         if (!this.isReconnecting) {
           this.isReconnecting = true;
           this.client.end();
-          setTimeout(() => {
-            this.connect(); // Retry connecting after error
-          }, 5000);
+          setTimeout(() => this.connect(), 5000);
         }
       });
 
       this.client.on("close", () => {
-        console.log(
-          "Disconnected from MQTT broker, attempting to reconnect..."
-        );
         if (!this.isReconnecting) {
           this.isReconnecting = true;
-          setTimeout(() => {
-            this.connect(); // Retry connecting
-          }, 5000);
+          setTimeout(() => this.connect(), 5000);
         }
-      });
-
-      this.client.on("reconnect", () => {
-        console.log("Attempting to reconnect to MQTT broker...");
-      });
-
-      this.client.on("offline", () => {
-        console.log("MQTT client is offline");
       });
     }
   }
 
-  // Set a callback to be called on successful connection
   onConnect(callback) {
     this.onConnectCallback = callback;
+    // console.log("Broker is ready");
+    if (this.client?.connected) {
+      callback();
+    }
   }
 
-  // Subscribe to a topic
   subscribe(topic, callback) {
-    if (this.client && this.client.connected) {
-      // Check if client is connected
+    if (!this.client) {
+      this.pendingSubscriptions.push({ topic, callback });
+      return;
+    }
+
+    if (!this.client.connected) {
+      this.pendingSubscriptions.push({ topic, callback });
+      return;
+    }
+
+    // Add to message handlers
+    if (!this.messageHandlers.has(topic)) {
+      this.messageHandlers.set(topic, []);
+    }
+    this.messageHandlers.get(topic).push(callback);
+
+    // Subscribe if not already subscribed
+    if (!this.client.subscriptions?.[topic]) {
       this.client.subscribe(topic, (err) => {
         if (err) {
           console.error(`Failed to subscribe to topic: ${topic}`, err);
-        } else {
-          // console.log(`Subscribed to topic: ${topic}`);
-          // Set handler for the topic
-          this.client.on("message", (receivedTopic, payload) => {
-            if (matchTopic(receivedTopic, topic)) {
-              callback(receivedTopic, payload.toString());
-            }
-          });
+          return;
         }
+        console.log(`Subscribed to topic: ${topic}`);
       });
-    } else {
-      console.log("Client not connected. Adding to pending subscriptions.");
-      // Simpan langganan dalam senarai tertangguh
-      this.pendingSubscriptions.push({ topic, callback });
     }
   }
 
-  // Publish a message to a topic
   publish(topic, message) {
-    if (this.client) {
-      this.client.publish(topic, message, (err) => {
-        if (err) {
-          console.error(`Failed to publish message to topic: ${topic}`, err);
-        } else {
-          console.log(`Message published to topic: ${topic}`);
-        }
-      });
-    } else {
-      console.error("Client is not connected. Call connect() first.");
+    if (!this.client?.connected) {
+      console.error("Cannot publish: client not connected");
+      return;
     }
+    this.client.publish(topic, message);
   }
 
-  // Disconnect the client
   disconnect() {
     if (this.client) {
-      this.client.end(() => {
-        console.log("Disconnected");
-      });
+      this.messageHandlers.clear();
+      this.pendingSubscriptions = [];
+      this.client.end();
+      this.client = null;
+      // console.log("Disconnected from broker");
     }
   }
 }

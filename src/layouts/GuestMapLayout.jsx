@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import SideBarMap from "../components/mapmonitor/SideBarMap";
 import apiClient from "../utils/apiClient";
 import { MapGuestContext } from "../utils/Contexts";
 

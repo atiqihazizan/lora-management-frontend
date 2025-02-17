@@ -108,7 +108,6 @@ function MapMonitor() {
         zoomControl={false}
         // scrollWheelZoom={true}
         // dragging={true}
-
         maxZoom={18}
         minZoom={4}
         maxBounds={[[-90, -180], [90, 180]]}

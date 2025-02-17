@@ -29,7 +29,7 @@ function BoundaryNodes() {
   return mapSelect && processedMarkers?.filter(m => m.mapid === mapSelect?.id)?.map((m, i) => {
     return (
       <div key={i}>
-        <MarkerDevices data={m} />
+        <MarkerDevices data={m} topic={m.topic} />
         <WaveCircle map={map} radius={m.radius} center={m.center} />
       </div>
     );
