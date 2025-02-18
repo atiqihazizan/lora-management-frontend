@@ -5,23 +5,7 @@ import apiClient from "../../utils/apiClient";
 import { useMemo } from "react";
 import Loading from "../Loading";
 
-function MapBoundaries() {
-  const { mapSelect } = useMapGuestContext();
-
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["mapview", mapSelect?.id],
-    queryFn: async () => await apiClient.get(`/maps/${mapSelect?.id}`),
-    enabled: !!mapSelect?.id,
-    staleTime: 1000 * 60 * 5, // Cache data selama 5 minit
-    refetchOnWindowFocus: false, // Tidak fetch data baru bila window focus
-    refetchOnMount: false, // Tidak fetch data baru bila component mount
-    cacheTime: 1000 * 60 * 10, // Simpan cache selama 10 minit
-  });
-  if (isLoading) return <Loading />;
-  if (error) return "An error has occurred: " + error.message;
-  const { geojsonData = []} = data || {};
-console.log(1234)
-
+function MapBoundaries({geojsonData}) {
   return (
     <GeoJSON
       data={geojsonData}

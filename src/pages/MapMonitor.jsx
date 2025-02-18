@@ -25,6 +25,7 @@ function MapMonitor() {
   const { tiles, tilesLoading } = useStateContext();
   const [center,setCenter] = useState(DEFAULT_CENTER);
   const [zoom,setZoom] = useState(DEFAULT_ZOOM);
+  const [geojson, setGeojson] = useState(null);
   const mapRef = useRef();
 
   // Fetch boundaries on mount
@@ -39,6 +40,11 @@ function MapMonitor() {
     };
     fetchBoundaries();
   }, []);
+
+  const fetchMapNetwork = async(id)=>{
+    const {geojsonData, boundary} = await apiClient.get(`/maps/${id}`);
+    setGeojson(geojsonData);
+  }
 
   // Parse latlng string to array
   const parseLatlng = (latlng) => {
@@ -83,14 +89,13 @@ function MapMonitor() {
     setCenter(coords);
     setZoom(boundary.zoom || 15);
     mapRef.current.on('moveend', () => setMapSelect(boundary));
-    // mapRef.current.on('movestart', () => setMapSelect(null));
-
+    fetchMapNetwork(boundary.id)
+    
     return () => {
       if(!mapRef.current) return;
       mapRef.current.off('moveend', () => setMapSelect(null));
-      // mapRef.current.off('movestart', () => setMapSelect(null));
     };
-  }, [slug, guestMaps]);
+  }, [slug, guestMaps,mapRef]);
 
   return (
       <MapContainer
@@ -115,9 +120,10 @@ function MapMonitor() {
           </LayersControl>
         )}
 
+        {geojson && <MapBoundaries geojsonData={geojson} />}
+
         {mapSelect?.latlng && (
           <>
-            <MapBoundaries />
             <BoundaryNodes />
             <BoundaryMarker />
             <DevicesNode />
